@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutorial — Interno++</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    color: #222;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ── Layout ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 20mm 18mm 18mm;
+  }
+
+  /* ── Capa ── */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 240mm;
+    border-bottom: 2px solid #1a237e;
+    margin-bottom: 12mm;
+  }
+  .cover-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .cover h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a237e;
+    margin: 0 0 4px;
+  }
+  .cover-sub {
+    font-size: 15px;
+    color: #444;
+    margin: 0 0 24px;
+  }
+  .cover-url {
+    display: inline-block;
+    background: #f0f2ff;
+    border: 1px solid #9fa8da;
+    padding: 6px 14px;
+    font-size: 14px;
+    color: #1a237e;
+    font-family: monospace;
+    margin-bottom: 32px;
+  }
+  .cover-warning {
+    border-left: 4px solid #b71c1c;
+    padding: 10px 14px;
+    background: #fff8f8;
+    font-size: 12px;
+    color: #b71c1c;
+    font-weight: 600;
+    max-width: 130mm;
+  }
+  .cover-desc {
+    margin-top: 28px;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.7;
+    max-width: 140mm;
+  }
+  .cover-desc ul { margin: 6px 0 0; padding-left: 18px; }
+  .cover-desc li { margin-bottom: 4px; }
+
+  /* ── Seções ── */
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a237e;
+    border-bottom: 2px solid #1a237e;
+    padding-bottom: 5px;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .section-intro {
+    font-size: 12px;
+    color: #555;
+    margin: 0 0 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Steps ── */
+  .steps { margin: 0 0 16px; }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: #1a237e;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-text {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #222;
+  }
+  .step-text strong { color: #1a237e; }
+  kbd {
+    display: inline-block;
+    background: #f0f0f0;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #333;
+  }
+
+  /* ── Blocos de PDF mock ── */
+  .pdf-block {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    border-left: 4px solid #9fa8da;
+    padding: 10px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 10.5px;
+    line-height: 1.65;
+    color: #333;
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .pdf-block-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  /* ── Resultado esperado ── */
+  .result-block {
+    background: #f0f4ff;
+    border: 1px solid #9fa8da;
+    padding: 10px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 10.5px;
+    line-height: 1.65;
+    color: #1a237e;
+    white-space: pre-wrap;
+    margin-top: 10px;
+  }
+  .result-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 10px;
+    color: #3949ab;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  /* ── Separador ── */
+  .divider {
+    border: none;
+    border-top: 1px solid #d0d0d0;
+    margin: 18px 0;
+  }
+
+  /* ── Nota ── */
+  .note {
+    font-size: 11px;
+    color: #666;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 8px 12px;
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+  .note strong { color: #333; }
+
+  /* ── Arrow connector ── */
+  .arrow {
+    text-align: center;
+    font-size: 18px;
+    color: #9fa8da;
+    margin: 6px 0;
+    line-height: 1;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; padding: 18mm 16mm; }
+    .page-break { page-break-before: always; }
+    .cover { min-height: 230mm; }
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ CAPA ══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-label">Hospital Universitário de Lagarto — HUL</div>
+    <h1>Interno++</h1>
+    <div class="cover-sub">Guia de uso — Transcrição de exames do AGHU</div>
+    <div class="cover-url">https://hul-interno.vercel.app</div>
+    <div class="cover-warning">
+      ⚠ Sempre confira todos os dados transcritos antes de registrar em prontuário.
+    </div>
+    <div class="cover-desc">
+      O Interno++ lê texto copiado diretamente dos PDFs do AGHU e formata os resultados para anotação clínica rápida. Ele não acessa o prontuário — apenas processa o texto colado pelo usuário.
+      <ul>
+        <li>Exames Laboratoriais — Laudo Individual</li>
+        <li>Controles e Sinais Vitais — Monitorização</li>
+        <li>Balanço Hídrico — Controle Hídrico</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 1: LABORATÓRIO ══════════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-title">1. Exames Laboratoriais</div>
+  <p class="section-intro">
+    O Laudo Individual do AGHU contém todos os exames de sangue, gasometria e urina com data e hora de coleta. O app detecta automaticamente cada resultado e os agrupa por data.
+  </p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">No AGHU, abra o <strong>Laudo Individual</strong> do paciente no visualizador de PDF.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Pressione <kbd>Ctrl+A</kbd> para selecionar todo o texto do PDF.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">Pressione <kbd>Ctrl+C</kbd> para copiar.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">Acesse <strong>https://hul-interno.vercel.app</strong>, clique na caixa <strong>Exames Laboratoriais</strong> e pressione <kbd>Ctrl+V</kbd> para colar.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-text">Clique em <strong>Extrair</strong>. O resultado aparece abaixo.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-text">Clique em <strong>Copiar resultado</strong> e cole no prontuário.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="pdf-block-label">Exemplo — trecho do Laudo Individual (texto copiado do PDF)</div>
+  <div class="pdf-block">Paciente: PACIENTE EXEMPLO
+Data de Nascimento: 01/01/1980
+Prontuário: 000000/0
+Dr(a): MÉDICO RESPONSÁVEL
+
+GASOMETRIA ARTERIAL
+pH:              7,308
+PCO2:            15,20    mmHg
+PO2:             159,00   mmHg
+HCO3:            7,66     mmol/L
+BE:              -15,90   mmol/L
+SO2:             91,00    %
+LACTATO
+:                1,5      mmol/L
+
+Recebimento material: 07/06/26 11:16
+
+POTÁSSIO:        5,30   mEq/L
+
+Recebimento material: 07/06/26 11:26
+
+SÓDIO:           127    mmol/L
+
+Recebimento material: 07/06/26 11:26
+
+CREATININA:      5,72   mg/dL
+
+Recebimento material: 07/06/26 11:26
+
+UREIA:           372    mg/dL
+
+Recebimento material: 07/06/26 11:26
+
+HEMOGRAMA
+HEMOGLOBINA:     10,1  g/dL
+HEMATÓCRITO:     27,9  %
+LEUCÓCITOS TOTAIS:     16500  /µL
+SEGMENTADOS:     81    %
+LINFÓCITOS:      6     %
+BASTÕES:         0     %
+PLAQUETAS/µL:
+561000
+
+Recebimento material: 07/06/26 11:26</div>
+
+  <div class="arrow">↓</div>
+
+  <div class="result-label">Resultado gerado pelo Interno++</div>
+  <div class="result-block">07/06/26 → Cr: 5,72 | Ur: 372 | K: 5,30 | Na: 127 | Hb: 10,1 | Ht: 27,9 | Leuco: 16500 (Neut 81% Linf 6%) | Plaq: 561000
+Gaso 07/06/26: pH 7,308 | pCO2 15,20 | pO2 159,00 | HCO3 7,66 | BE -15,90 | Sat 91% | Lact 1,5</div>
+
+  <div class="note">
+    <strong>Regra de hora:</strong> Se houver mais de uma coleta no dia para o mesmo exame, o app exibe cada linha com o horário. Se um exame aparece só uma vez no dia, fica na linha de data sem hora — independente dos demais exames.<br>
+    <strong>Blastos:</strong> se o hemograma reportar blastos &gt; 0%, o app exibe automaticamente <code>****ATENÇÃO PARA PRESENÇA DE BLASTOS****</code> no início e no fim da transcrição.
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 2: CONTROLES ═════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-title">2. Controles — Sinais Vitais</div>
+  <p class="section-intro">
+    O PDF de Monitorização registra PAS, PAD, FC, FR, Temperatura e Saturação em múltiplos horários. O app calcula o mínimo e máximo de cada parâmetro por dia.
+  </p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">No AGHU, abra o <strong>Registro de Controles do Paciente — Monitorização</strong>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Pressione <kbd>Ctrl+A</kbd> → <kbd>Ctrl+C</kbd> para copiar todo o conteúdo.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">No site, clique na caixa <strong>Controles — Sinais Vitais</strong> e pressione <kbd>Ctrl+V</kbd>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">Clique em <strong>Extrair</strong> → resultado → <strong>Copiar resultado</strong>.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="pdf-block-label">Exemplo — trecho da Monitorização (texto copiado do PDF)</div>
+  <div class="pdf-block">Registro de Controles do Paciente - Monitorização
+
+Nome: PACIENTE EXEMPLO         Prontuário: 000000/0
+Período de 07/06/2026 às 02:05 hs até 08/06/2026 às 00:24 hs.
+
+07/06 04:00 134
+94 68 19
+34,8 91
+07/06 08:00 128
+82 72 18
+36,2 94
+07/06 12:00 118
+76 80 20
+36,5 96
+07/06 16:00 122
+78 76 18
+36,8 93
+07/06 20:00 130
+84 74 19
+37,0 92
+07/06 23:00 124
+80 70 20
+36,6 95
+08/06 04:00 110
+72 66 18
+36,4 97
+08/06 08:00 116
+74 68 19
+36,3 96</div>
+
+  <div class="arrow">↓</div>
+
+  <div class="result-label">Resultado gerado pelo Interno++</div>
+  <div class="result-block">CONTROLES 07/06
+Tax 34,8-37,0
+FC 68-80
+PAS 118-134
+PAD 76-94
+Sat 91-96
+
+CONTROLES 08/06
+Tax 36,3-36,4
+FC 66-68
+PAS 110-116
+PAD 72-74
+Sat 96-97</div>
+
+  <div class="note">
+    <strong>Formato dos dados:</strong> Os valores de cada medição ficam distribuídos em linhas após o timestamp no PDF — isso é normal. O app os coleta automaticamente na ordem correta: PAS → PAD → FC → FR → Temperatura → Saturação. Medições com menos de 6 valores são ignoradas.
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 3: BALANÇO HÍDRICO ══════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-title">3. Balanço Hídrico</div>
+  <p class="section-intro">
+    O PDF de Controle Hídrico contém os volumes administrados, eliminados e o saldo do balanço do período. O app extrai os três valores e formata em uma linha.
+  </p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">No AGHU, abra o <strong>Registro de Controles do Paciente — Controle Hídrico</strong>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Pressione <kbd>Ctrl+A</kbd> → <kbd>Ctrl+C</kbd> para copiar todo o conteúdo.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">No site, clique na caixa <strong>Balanço Hídrico</strong> e pressione <kbd>Ctrl+V</kbd>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">Clique em <strong>Extrair</strong> → resultado → <strong>Copiar resultado</strong>.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="pdf-block-label">Exemplo — trecho do Controle Hídrico (texto copiado do PDF)</div>
+  <div class="pdf-block">Registro de Controles do Paciente - Controle Hídrico
+
+Nome: PACIENTE EXEMPLO         Prontuário: 000000/0
+Período de 07/06
+
+3. BALANÇO HÍDRICO
+Total de Volumes Administrados:
+Total de Volumes Eliminados:
+Balanço Hídrico:
+100,00
+2.300,00
+-2.200,00</div>
+
+  <div class="arrow">↓</div>
+
+  <div class="result-label">Resultado gerado pelo Interno++</div>
+  <div class="result-block">BH 07/06: Adm 100ml | Elim 2300ml | Saldo -2200ml</div>
+
+  <div class="note">
+    <strong>Quirk do PDF:</strong> No texto copiado, os labels ("Total de Volumes Administrados" etc.) e os valores ficam separados — os valores aparecem em bloco após todos os labels. O app detecta isso automaticamente buscando os números após o último label.
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="margin-top: 24px; padding: 14px 16px; border: 1px solid #d0d0d0; background: #fafafa;">
+    <div style="font-weight: 700; font-size: 13px; margin-bottom: 10px; color: #1a237e;">Resumo do fluxo — qualquer seção</div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; flex-wrap: wrap; line-height: 2;">
+      <span style="background:#1a237e;color:#fff;padding:3px 10px;">PDF no AGHU</span>
+      <span style="color:#999;">→</span>
+      <kbd>Ctrl+A</kbd>
+      <span style="color:#999;">→</span>
+      <kbd>Ctrl+C</kbd>
+      <span style="color:#999;">→</span>
+      <span style="background:#1a237e;color:#fff;padding:3px 10px;">hul-interno.vercel.app</span>
+      <span style="color:#999;">→</span>
+      <span style="background:#f0f0f0;border:1px solid #bbb;padding:3px 10px;">Colar na caixa</span>
+      <span style="color:#999;">→</span>
+      <span style="background:#f0f0f0;border:1px solid #bbb;padding:3px 10px;">Extrair</span>
+      <span style="color:#999;">→</span>
+      <span style="background:#f0f0f0;border:1px solid #bbb;padding:3px 10px;">Copiar resultado</span>
+      <span style="color:#999;">→</span>
+      <span style="background:#1a237e;color:#fff;padding:3px 10px;">Prontuário</span>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px; border-top: 2px solid #1a237e; padding-top: 10px; font-size: 11px; color: #888; text-align: center;">
+    Interno++ v0.1beta — Hospital Universitário de Lagarto (HUL) — https://hul-interno.vercel.app<br>
+    Cheque sempre todos os dados transcritos antes de registrar em prontuário.
+  </div>
+</div>
+
+</body>
+</html>
