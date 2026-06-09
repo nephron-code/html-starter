@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interno++</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px; color: #333; background: #f5f5f5;
+            margin: 0; padding: 0;
+        }
+        header {
+            max-width: 900px; margin: 0 auto; padding: 28px 20px 4px;
+        }
+        h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 2px; color: #1a237e; }
+        .subtitle { font-size: 13px; color: #888; margin: 0 0 24px; }
+        .section {
+            max-width: 900px; margin: 0 auto 0; padding: 0 20px 24px;
+        }
+        .section + .section { border-top: 1px solid #d0d0d0; padding-top: 24px; }
+        h3 { font-size: 0.95rem; font-weight: 600; margin: 0 0 6px; color: #333; text-transform: uppercase; letter-spacing: 0.04em; }
+        .hint { font-size: 12px; color: #999; margin: 0 0 10px; }
+        textarea {
+            width: 100%; height: 160px; padding: 10px; font-size: 13px;
+            border: 1px solid #d0d0d0; background: #fff;
+            resize: vertical; outline: none; display: block;
+            font-family: inherit; line-height: 1.5;
+        }
+        textarea:focus { border-color: #3949ab; }
+        .actions { display: flex; gap: 8px; margin: 8px 0; }
+        button {
+            background: #1a237e; color: #fff; border: none;
+            padding: 8px 18px; font-size: 13px; font-family: inherit;
+            cursor: pointer;
+        }
+        button:hover { background: #283593; }
+        button.secondary {
+            background: #fff; color: #333; border: 1px solid #d0d0d0;
+        }
+        button.secondary:hover { background: #f0f0f0; }
+        .resultado {
+            width: 100%; min-height: 60px; padding: 10px;
+            border: 1px solid #d0d0d0; background: #fff;
+            font-size: 13px; line-height: 1.65; white-space: pre-wrap;
+            word-break: break-word; color: #333;
+        }
+        footer { height: 48px; }
+        @media (max-width: 768px) {
+            .actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Interno++</h1>
+    <p class="subtitle">Transcrição de exames — Hospital Universitário de Lagarto (AGHU)</p>
+</header>
+
+<!-- SEÇÃO 1: LABORATÓRIO -->
+<div class="section">
+    <h3>Exames Laboratoriais</h3>
+    <p class="hint">Cole o texto do Laudo Individual do AGHU.</p>
+    <textarea id="textoLab" placeholder="Cole o laudo aqui..."></textarea>
+    <div class="actions">
+        <button onclick="extrairLab()">Extrair</button>
+        <button class="secondary" onclick="copiarResultado('resultadoLab')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoLab">Nenhum dado extraído ainda.</div>
+</div>
+
+<!-- SEÇÃO 2: CONTROLES -->
+<div class="section">
+    <h3>Controles — Sinais Vitais</h3>
+    <p class="hint">Cole o texto da Monitorização.</p>
+    <textarea id="textoControles" placeholder="Cole a monitorização aqui..."></textarea>
+    <div class="actions">
+        <button onclick="extrairControles()">Extrair</button>
+        <button class="secondary" onclick="copiarResultado('resultadoControles')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoControles">Nenhum dado extraído ainda.</div>
+</div>
+
+<!-- SEÇÃO 3: BALANÇO HÍDRICO -->
+<div class="section">
+    <h3>Balanço Hídrico</h3>
+    <p class="hint">Cole o texto do Controle Hídrico.</p>
+    <textarea id="textoBH" placeholder="Cole o balanço hídrico aqui..."></textarea>
+    <div class="actions">
+        <button onclick="extrairBH()">Extrair</button>
+        <button class="secondary" onclick="copiarResultado('resultadoBH')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoBH">Nenhum dado extraído ainda.</div>
+</div>
+
+<footer></footer>
+
+<script>
+// ── UTILITÁRIOS ──────────────────────────────────────────────
+
+function setResult(id, text) {
+    document.getElementById(id).textContent = text || 'Nenhum dado extraído.';
+}
+
+function copiarResultado(id) {
+    const text = document.getElementById(id).textContent;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+}
+
+function toFloat(s) {
+    if (!s) return NaN;
+    return parseFloat(String(s).replace(',', '.'));
+}
+
+// Extrai primeiro grupo de captura não-nulo entre vários padrões
+function getRaw(text) {
+    const pats = Array.prototype.slice.call(arguments, 1);
+    for (const pat of pats) {
+        const m = text.match(pat);
+        if (m) {
+            for (let i = 1; i < m.length; i++) {
+                if (m[i] !== undefined) return m[i].trim();
+            }
+        }
+    }
+    return null;
+}
+
+function isAbsent(val) {
+    if (!val) return true;
+    return /^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$/i.test(val.trim());
+}
+
+// ── SEÇÃO 1: LAUDO ───────────────────────────────────────────
+
+function extrairLab() {
+    setResult('resultadoLab', parseLaudo(document.getElementById('textoLab').value));
+}
+
+function findBlocks(text) {
+    const blocks = [];
+    const pat = /Recebimento material:\s*(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2})/gi;
+    const pos = [];
+    let m;
+    while ((m = pat.exec(text)) !== null) {
+        pos.push({ idx: m.index, end: m.index + m[0].length, date: m[1], time: m[2] });
+    }
+    // No AGHU, "Recebimento material:" fica no FINAL de cada exame.
+    // O bloco de cada exame é o texto ANTES do seu marcador.
+    for (let i = 0; i < pos.length; i++) {
+        const start = i === 0 ? 0 : pos[i - 1].end;
+        blocks.push({ text: text.slice(start, pos[i].idx), date: pos[i].date, time: pos[i].time });
+    }
+    return blocks;
+}
+
+function parseGaso(t) {
+    return {
+        ph:      getRaw(t, /\bpH[:\s]+([\d,\.]+)/i,
+                           /\bPH[:\s]+([\d,\.]+)/),
+        pco2:    getRaw(t, /PCO2[:\s]+([\d,\.]+)/i,
+                           /pCO2[:\s]+([\d,\.]+)/i,
+                           /PRESS[ÃA]O.*?CO2[^:]*:\s*([\d,\.]+)/i),
+        po2:     getRaw(t, /PO2[:\s]+([\d,\.]+)/i,
+                           /pO2[:\s]+([\d,\.]+)/i,
+                           /PRESS[ÃA]O.*?O2[^:]*:\s*([\d,\.]+)/i),
+        hco3:    getRaw(t, /HCO3[:\s]+([\d,\.]+)/i,
+                           /HCO-?3[:\s]+([\d,\.]+)/i,
+                           /BICARBONATO[^:]*:\s*([\d,\.]+)/i),
+        be:      getRaw(t, /\bBE[:\s]+(-?[\d,\.]+)/i,
+                           /\bEB[:\s]+(-?[\d,\.]+)/i,
+                           /EXCESSO[^:]*BASE[^:]*:\s*(-?[\d,\.]+)/i,
+                           /BASE[^:]*EXCESSO[^:]*:\s*(-?[\d,\.]+)/i),
+        so2:     getRaw(t, /\bSO2[:\s]+([\d,\.]+)/i,
+                           /SatO2[:\s]+([\d,\.]+)/i,
+                           /SpO2[:\s]+([\d,\.]+)/i,
+                           /SAT\.?\s*O2[^:]*:\s*([\d,\.]+)/i),
+        lactato: getRaw(t, /LACTATO[^:]*:\s*([\d,\.]+)/i,
+                           /[AÁ]CIDO\s+L[AÁ][CT]ICO[^:]*:\s*([\d,\.]+)/i)
+    };
+}
+
+function parseHemogram(t) {
+    return {
+        hb:   getRaw(t, /HEMOGLOBINA:\s*([\d,\.]+)\s*g/i),
+        ht:   getRaw(t, /HEMAT[ÓO]CRITO:\s*([\d,\.]+)\s*%/i),
+        leuco: getRaw(t, /LEUC[ÓO]CITOS\s+TOTAIS:\s*([\d\.]+)/i),
+        neut: getRaw(t, /SEGMENTADOS:\s*([\d,\.]+)\s*%/i),
+        linf: getRaw(t, /LINF[ÓO]CITOS:\s*([\d,\.]+)\s*%/i),
+        bast: getRaw(t, /BAST[ÕO]ES:\s*([\d,\.]+)\s*%/i),
+        plaq: getRaw(t, /PLAQUETAS[^:]*:\s*\n?\s*([\d\.]+)/i)
+    };
+}
+
+function parseOtherExams(t) {
+    const res = {};
+    const map = [
+        ['k',     /POT[AÁ]SSIO:\s*([\d,\.]+)/i],
+        ['na',    /S[OÓ]DIO:\s*([\d,\.]+)/i],
+        ['cr',    /CREATININA:\s*([\d,\.]+)/i],
+        ['ur',    /UREIA:\s*([\d,\.]+)/i],
+        ['pcr',   /PROTE[IÍ]NA C[- ]?REATIVA:\s*([\d,\.]+)/i, /\bPCR:\s*([\d,\.]+)/i],
+        ['tgo',   /AST\/TGO:\s*([\d,\.]+)/i, /\bTGO:\s*([\d,\.]+)/i, /\bAST:\s*([\d,\.]+)/i],
+        ['tgp',   /ALT\/TGP:\s*([\d,\.]+)/i, /\bTGP:\s*([\d,\.]+)/i, /\bALT:\s*([\d,\.]+)/i],
+        ['glic',  /GLICOSE:\s*([\d,\.]+)/i],
+        ['ca',    /C[AÁ]LCIO[^:]*:\s*([\d,\.]+)/i],
+        ['mg',    /MAGN[EÉ]SIO:\s*([\d,\.]+)/i],
+        ['p',     /F[OÓ]SFORO:\s*([\d,\.]+)/i],
+        ['bil',   /BILIRRUBINA TOTAL:\s*([\d,\.]+)/i],
+        ['ggt',   /GAMA.?GT:\s*([\d,\.]+)/i, /\bGGT:\s*([\d,\.]+)/i],
+        ['fal',   /FOSFATASE ALCALINA:\s*([\d,\.]+)/i],
+        ['alb',   /ALBUMINA:\s*([\d,\.]+)/i],
+        ['dhl',   /\bDHL:\s*([\d,\.]+)/i, /\bLDH:\s*([\d,\.]+)/i],
+        ['acur',  /[AÁ]CIDO [UÚ]RICO:\s*([\d,\.]+)/i],
+        ['ferr',  /FERRITINA:\s*([\d,\.]+)/i],
+        ['hba1c', /HEMOGLOBINA GLICADA:\s*([\d,\.]+)/i, /HBA1C:\s*([\d,\.]+)/i],
+        ['tgl',   /TRIGLICER[IÍ]DEOS:\s*([\d,\.]+)/i],
+        ['ct',    /COLESTEROL TOTAL:\s*([\d,\.]+)/i],
+        ['hdl',   /\bHDL[^:\d]{0,20}:\s*([\d,\.]+)/i],
+        ['ldl',   /\bLDL[^:\d]{0,20}:\s*([\d,\.]+)/i],
+        ['tsh',   /\bTSH:\s*([\d,\.]+)/i],
+        ['t4l',   /T4 LIVRE:\s*([\d,\.]+)/i],
+        ['vitd',  /VITAMINA D[^:]*:\s*([\d,\.]+)/i],
+        ['inr',   /\bINR:\s*([\d,\.]+)/i],
+        ['ttpa',  /\bTTPA:\s*([\d,\.]+)/i],
+        ['tp',    /TEMPO DE PROTROMBINA[^:]*:\s*([\d,\.]+)/i],
+        ['ddim',  /D-?D[IÍ]MERO:\s*([\d,\.]+)/i],
+        ['pct',   /PROCALCITONINA:\s*([\d,\.]+)/i],
+        ['amil',  /AMILASE:\s*([\d,\.]+)/i],
+        ['lip',   /LIPASE:\s*([\d,\.]+)/i],
+    ];
+    for (const [key, ...pats] of map) {
+        const v = getRaw(t, ...pats);
+        if (v !== null) res[key] = v;
+    }
+    // Anti-HIV
+    if (/ANTI.?HIV/i.test(t)) {
+        const m = t.match(/RESULTADO:\s*(N[ÃA]O REAGENTE|REAGENTE)/i);
+        if (m) res.hiv = m[1];
+    }
+    return res;
+}
+
+function parseUrina(t) {
+    const g = (...p) => getRaw(t, ...p);
+    return {
+        ph:            g(/P\.?H\.?:\s*([\d,\.]+)/i),
+        densidade:     g(/DENSIDADE:\s*([\d,\.]+)/i),
+        leuco:         g(/LEUCOCITOS:\s*([^\s\n]+)/i),
+        hemacias:      g(/HEMACIAS:\s*([^\s\n]+)/i),
+        nitrito:       g(/NITRITO:\s*([^\s\n]+)/i),
+        proteinas:     g(/PROTEINAS:\s*([^\s\n]+)/i),
+        glicose:       g(/GLICOSE:\s*([^\s\n]+)/i),
+        hemoglobina:   g(/HEMOGLOBINA:\s*([^\s\n]+)/i),
+        bilirrubina:   g(/BILIRRUBINA:\s*([^\s\n]+)/i),
+        urobilinogenio:g(/UROBILINOGENIO:\s*([^\s\n]+)/i),
+        corposcetonico:g(/CORPOSCETONICO:\s*([^\s\n]+)/i),
+        piocitos:      g(/PIOCITOS:\s*([^\s\n]+)/i),
+        aspecto:       g(/ASPECTO:\s*([^\s\n]+)/i),
+    };
+}
+
+function parseLaudo(text) {
+    if (!text.trim()) return 'Cole um laudo para extrair.';
+    const norm = text.replace(/\n\s*:/g, ':'); // fix "LACTATO\n: 1,5"
+    const blocks = findBlocks(norm);
+    if (!blocks.length) return 'Nenhum bloco encontrado.\nVerifique se o texto contém "Recebimento material:".';
+
+    // date → time → { exams, gaso, urina }
+    const byDate = {};
+
+    for (const b of blocks) {
+        const d = b.date, t = b.time;
+        if (!byDate[d]) byDate[d] = {};
+        if (!byDate[d][t]) byDate[d][t] = { exams: {}, gaso: null, urina: null };
+        const txt = b.text;
+
+        if (/GASOMETRIA/i.test(txt))          byDate[d][t].gaso  = parseGaso(txt);
+        if (/SUM[AÁ]RIO DE URINA/i.test(txt)) byDate[d][t].urina = parseUrina(txt);
+        if (/HEMOGRAMA/i.test(txt))            Object.assign(byDate[d][t].exams, parseHemogram(txt));
+        Object.assign(byDate[d][t].exams, parseOtherExams(txt));
+    }
+
+    const parseDate = s => { const [dd, mm, yy] = s.split('/').map(Number); return new Date(2000 + yy, mm - 1, dd); };
+    const sortedDates = Object.keys(byDate).sort((a, b) => parseDate(a) - parseDate(b));
+    const lines = [];
+
+    for (const date of sortedDates) {
+        const timeMap = byDate[date];
+        const sortedTimes = Object.keys(timeMap).sort();
+
+        if (sortedTimes.length === 1) {
+            // Único horário no dia → sem hora em tudo
+            const t = sortedTimes[0];
+            const line = buildMainLine(date, null, timeMap[t].exams);
+            if (line) lines.push(line);
+            if (timeMap[t].gaso)  { const l = buildGasoLine(date, null, timeMap[t].gaso);   if (l) lines.push(l); }
+            if (timeMap[t].urina) { const l = buildUrinaLine(date, null, timeMap[t].urina); if (l) lines.push(l); }
+        } else {
+            // Múltiplos horários:
+            // exames com UMA ocorrência no dia → linha única sem hora (no topo)
+            // exames com MÚLTIPLAS ocorrências → uma linha por horário com hora
+
+            const keyCounts = {};
+            for (const t of sortedTimes) {
+                for (const k of Object.keys(timeMap[t].exams)) {
+                    keyCounts[k] = (keyCounts[k] || 0) + 1;
+                }
+            }
+
+            // Linha de data única (exames que aparecem só uma vez no dia)
+            const singleExams = {};
+            for (const t of sortedTimes) {
+                for (const [k, v] of Object.entries(timeMap[t].exams)) {
+                    if (keyCounts[k] === 1) singleExams[k] = v;
+                }
+            }
+            const singleLine = buildMainLine(date, null, singleExams);
+            if (singleLine) lines.push(singleLine);
+
+            // Linhas por horário (exames que aparecem mais de uma vez)
+            for (const t of sortedTimes) {
+                const multiExams = Object.fromEntries(
+                    Object.entries(timeMap[t].exams).filter(([k]) => keyCounts[k] > 1)
+                );
+                if (Object.keys(multiExams).length > 0) {
+                    const line = buildMainLine(date, t, multiExams);
+                    if (line) lines.push(line);
+                }
+            }
+
+            // Gasometria
+            const gasoTimes = sortedTimes.filter(t => timeMap[t].gaso !== null);
+            for (const t of gasoTimes) {
+                const line = buildGasoLine(date, gasoTimes.length > 1 ? t : null, timeMap[t].gaso);
+                if (line) lines.push(line);
+            }
+
+            // Urina — sempre linha própria
+            const urinaTimes = sortedTimes.filter(t => timeMap[t].urina !== null);
+            for (const t of urinaTimes) {
+                const line = buildUrinaLine(date, urinaTimes.length > 1 ? t : null, timeMap[t].urina);
+                if (line) lines.push(line);
+            }
+        }
+    }
+
+    return lines.length ? lines.join('\n') : 'Nenhum exame reconhecido.';
+}
+
+function buildMainLine(date, time, e) {
+    const parts = [];
+    if (e.hb) parts.push('Hb: ' + e.hb);
+    if (e.ht) parts.push('Ht: ' + e.ht);
+    if (e.leuco) {
+        let ls = 'Leuco: ' + e.leuco;
+        const diff = [];
+        if (e.neut) diff.push('Neut ' + e.neut + '%');
+        if (e.linf) diff.push('Linf ' + e.linf + '%');
+        if (e.bast && toFloat(e.bast) > 0) diff.push('Bast ' + e.bast + '%');
+        if (diff.length) ls += ' (' + diff.join(' ') + ')';
+        parts.push(ls);
+    }
+    if (e.plaq) parts.push('Plaq: ' + e.plaq);
+
+    const order = [
+        ['cr','Cr'],['ur','Ur'],['k','K'],['na','Na'],
+        ['pcr','PCR'],['tgo','TGO'],['tgp','TGP'],['glic','Glic'],
+        ['ca','Ca'],['mg','Mg'],['p','P'],
+        ['bil','Bil'],['ggt','GGT'],['fal','FAL'],['alb','Alb'],
+        ['dhl','DHL'],['acur','AcUr'],['hba1c','HbA1c'],
+        ['tgl','TGL'],['ct','CT'],['hdl','HDL'],['ldl','LDL'],
+        ['tsh','TSH'],['t4l','T4L'],['vitd','VitD'],
+        ['inr','INR'],['ttpa','TTPA'],['tp','TP'],['ddim','D-Dím'],
+        ['pct','PCT'],['ferr','Ferr'],['amil','Amil'],['lip','Lip'],
+    ];
+    for (const [k, label] of order) {
+        if (e[k]) parts.push(label + ': ' + e[k]);
+    }
+    if (e.hiv) parts.push('Anti-HIV: ' + (/N[ÃA]O/i.test(e.hiv) ? 'Não reagente' : 'REAGENTE ⚠️'));
+    if (!parts.length) return null;
+    const prefix = time ? date + ' ' + time : date;
+    return prefix + ' → ' + parts.join(' | ');
+}
+
+function buildGasoLine(date, time, v) {
+    const p = [];
+    if (v.ph)      p.push('pH ' + v.ph);
+    if (v.pco2)    p.push('pCO2 ' + v.pco2);
+    if (v.po2)     p.push('pO2 ' + v.po2);
+    if (v.hco3)    p.push('HCO3 ' + v.hco3);
+    if (v.be)      p.push('BE ' + v.be);
+    if (v.so2)     p.push('Sat ' + v.so2 + '%');
+    if (v.lactato) p.push('Lact ' + v.lactato);
+    if (!p.length) return null;
+    const prefix = time ? 'Gaso ' + date + ' ' + time : 'Gaso ' + date;
+    return prefix + ': ' + p.join(' | ');
+}
+
+function buildUrinaLine(date, time, v) {
+    const p = [];
+    if (v.aspecto && !/L[IÍ]MPIDO|AMARELO CLARO/i.test(v.aspecto)) p.push('Asp ' + v.aspecto);
+    if (v.ph)        p.push('pH ' + v.ph);
+    if (v.densidade) p.push('D ' + v.densidade);
+    if (v.leuco)     p.push('Leuco ' + v.leuco);
+    if (v.hemacias)  p.push('Hem ' + v.hemacias);
+    if (v.nitrito)   p.push('Nit ' + (isAbsent(v.nitrito) ? 'Aus' : v.nitrito));
+    if (v.proteinas      && !isAbsent(v.proteinas))      p.push('Prot ' + v.proteinas);
+    if (v.glicose        && !isAbsent(v.glicose))        p.push('Glic ' + v.glicose);
+    if (v.hemoglobina    && !isAbsent(v.hemoglobina))    p.push('Hb ' + v.hemoglobina);
+    if (v.bilirrubina    && !isAbsent(v.bilirrubina))    p.push('Bil ' + v.bilirrubina);
+    if (v.urobilinogenio && !isAbsent(v.urobilinogenio)) p.push('Urobil ' + v.urobilinogenio);
+    if (v.corposcetonico && !isAbsent(v.corposcetonico)) p.push('Cetona ' + v.corposcetonico);
+    if (v.piocitos && !isAbsent(v.piocitos)) p.push('Piócitos ' + v.piocitos);
+    if (!p.length) return null;
+    const prefix = time ? 'Urina ' + date + ' ' + time : 'Urina ' + date;
+    return prefix + ': ' + p.join(' | ');
+}
+
+// ── SEÇÃO 2: CONTROLES ───────────────────────────────────────
+
+function extrairControles() {
+    setResult('resultadoControles', parseControles(document.getElementById('textoControles').value));
+}
+
+function parseControles(text) {
+    if (!text.trim()) return 'Cole o texto da Monitorização para extrair.';
+    const byDay = {};
+    const dateLineRe = /^(\d{2}\/\d{2})\s+(\d{2}:\d{2})(.*)/;
+    const hasLetters = s => /[a-zA-ZÀ-ÿ]/.test(s);
+    const extractNums = s => (s.match(/[\d,]+/g) || [])
+        .map(v => parseFloat(v.replace(',', '.'))).filter(n => !isNaN(n));
+
+    const lines = text.split('\n').map(l => l.trim());
+    let i = 0;
+    while (i < lines.length) {
+        const m = lines[i].match(dateLineRe);
+        if (!m) { i++; continue; }
+        const day = m[1];
+        // Collect numbers from this line and subsequent pure-number lines
+        const nums = extractNums(m[3]);
+        i++;
+        while (i < lines.length && nums.length < 7) {
+            const next = lines[i];
+            if (/^\d{2}\/\d{2}\s+\d{2}:\d{2}/.test(next)) break; // next timestamp
+            if (hasLetters(next)) break;                           // annotation text
+            const n = extractNums(next);
+            if (n.length > 0) nums.push(...n);
+            i++;
+        }
+        if (nums.length < 6) continue; // no vitals recorded for this slot
+        const [pas, pad, fc, fr, tax, sat] = nums;
+        const gcap = nums[6];
+        if (!byDay[day]) byDay[day] = { pas:[], pad:[], fc:[], fr:[], tax:[], sat:[], dextro:[] };
+        byDay[day].pas.push(pas); byDay[day].pad.push(pad);
+        byDay[day].fc.push(fc);   byDay[day].fr.push(fr);
+        byDay[day].tax.push(tax); byDay[day].sat.push(sat);
+        if (gcap !== undefined && !isNaN(gcap)) byDay[day].dextro.push(gcap);
+    }
+    if (!Object.keys(byDay).length)
+        return 'Nenhum controle encontrado.\nVerifique se o texto contém linhas DD/MM HH:MM com valores de PAS PAD FC FR Tax Sat.';
+
+    function minMax(arr) {
+        if (!arr.length) return null;
+        const mn = Math.min(...arr), mx = Math.max(...arr);
+        const f = n => { const s = Math.round(n * 10) / 10; return Number.isInteger(s) ? String(s) : s.toFixed(1).replace('.', ','); };
+        return mn === mx ? f(mn) : f(mn) + '-' + f(mx);
+    }
+
+    const sorted = Object.keys(byDay).sort((a, b) => {
+        const [da, ma] = a.split('/').map(Number), [db, mb] = b.split('/').map(Number);
+        return ma !== mb ? ma - mb : da - db;
+    });
+
+    return sorted.map(day => {
+        const d = byDay[day];
+        const items = ['CONTROLES ' + day];
+        const tax = minMax(d.tax), fc = minMax(d.fc), pas = minMax(d.pas);
+        const pad = minMax(d.pad), sat = minMax(d.sat), dext = minMax(d.dextro);
+        if (tax)  items.push('Tax ' + tax);
+        if (fc)   items.push('FC ' + fc);
+        if (pas)  items.push('PAS ' + pas);
+        if (pad)  items.push('PAD ' + pad);
+        if (sat)  items.push('Sat ' + sat);
+        if (dext) items.push('Dextro ' + dext);
+        return items.join('\n');
+    }).join('\n\n');
+}
+
+// ── SEÇÃO 3: BALANÇO HÍDRICO ─────────────────────────────────
+
+function extrairBH() {
+    setResult('resultadoBH', parseBH(document.getElementById('textoBH').value));
+}
+
+function parseBH(text) {
+    if (!text.trim()) return 'Cole o texto do Balanço Hídrico para extrair.';
+
+    const dateM = text.match(/Per[ií]odo de (\d{2}\/\d{2})/i);
+    const day = dateM ? dateM[1] : 'DD/MM';
+
+    const clean = s => {
+        const n = parseFloat(String(s).replace(/\./g, '').replace(',', '.'));
+        return isNaN(n) ? '?' : Math.round(n).toString();
+    };
+
+    // No PDF real, os três valores aparecem como linhas isoladas após os labels.
+    // Ordem no texto: Adm → Elim → Saldo (confirmado pela soma das entradas).
+    // Busca a partir de "Total de Volumes Eliminados:" (último label antes dos valores).
+    const startIdx = text.search(/Total de Volumes Eliminados:/i);
+    if (startIdx !== -1) {
+        const section = text.slice(startIdx);
+        const numRe = /^(-?[\d\.]+,\d+)\s*$/mg;
+        const nums = [];
+        let m;
+        while ((m = numRe.exec(section)) !== null && nums.length < 3) {
+            nums.push(m[1]);
+        }
+        if (nums.length === 3) {
+            return 'BH ' + day + ': Adm ' + clean(nums[0]) + 'ml | Elim ' + clean(nums[1]) + 'ml | Saldo ' + clean(nums[2]) + 'ml';
+        }
+    }
+
+    // Fallback: valores na mesma linha que o label (formato alternativo)
+    const admM  = text.match(/Total de Volumes Administrados:\s*([-\d\.,]+)/i);
+    const elimM = text.match(/Total de Volumes Eliminados:\s*([-\d\.,]+)/i);
+    const bhM   = text.match(/Balan[çc]o H[íi]drico:\s*([-\d\.,]+)/i);
+    if (!admM && !elimM && !bhM) return 'Totais não encontrados.\nVerifique se o texto contém "Total de Volumes Administrados" e "Total de Volumes Eliminados".';
+    return 'BH ' + day + ': Adm ' + clean(admM && admM[1]) + 'ml | Elim ' + clean(elimM && elimM[1]) + 'ml | Saldo ' + clean(bhM && bhM[1]) + 'ml';
+}
+</script>
+</body>
+</html>
