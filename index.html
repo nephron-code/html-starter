@@ -199,13 +199,14 @@ function parseGaso(t) {
 
 function parseHemogram(t) {
     return {
-        hb:   getRaw(t, /HEMOGLOBINA:\s*([\d,\.]+)\s*g/i),
-        ht:   getRaw(t, /HEMAT[ÓO]CRITO:\s*([\d,\.]+)\s*%/i),
+        hb:    getRaw(t, /HEMOGLOBINA:\s*([\d,\.]+)\s*g/i),
+        ht:    getRaw(t, /HEMAT[ÓO]CRITO:\s*([\d,\.]+)\s*%/i),
         leuco: getRaw(t, /LEUC[ÓO]CITOS\s+TOTAIS:\s*([\d\.]+)/i),
-        neut: getRaw(t, /SEGMENTADOS:\s*([\d,\.]+)\s*%/i),
-        linf: getRaw(t, /LINF[ÓO]CITOS:\s*([\d,\.]+)\s*%/i),
-        bast: getRaw(t, /BAST[ÕO]ES:\s*([\d,\.]+)\s*%/i),
-        plaq: getRaw(t, /PLAQUETAS[^:]*:\s*\n?\s*([\d\.]+)/i)
+        neut:  getRaw(t, /SEGMENTADOS:\s*([\d,\.]+)\s*%/i),
+        linf:  getRaw(t, /LINF[ÓO]CITOS:\s*([\d,\.]+)\s*%/i),
+        bast:  getRaw(t, /BAST[ÕO]ES:\s*([\d,\.]+)\s*%/i),
+        plaq:  getRaw(t, /PLAQUETAS[^:]*:\s*\n?\s*([\d\.]+)/i),
+        blast: getRaw(t, /BLASTOS?:\s*([\d,\.]+)\s*%/i)
     };
 }
 
@@ -286,6 +287,8 @@ function parseLaudo(text) {
     // date → time → { exams, gaso, urina }
     const byDate = {};
 
+    let hasBlast = false;
+
     for (const b of blocks) {
         const d = b.date, t = b.time;
         if (!byDate[d]) byDate[d] = {};
@@ -294,7 +297,11 @@ function parseLaudo(text) {
 
         if (/GASOMETRIA/i.test(txt))          byDate[d][t].gaso  = parseGaso(txt);
         if (/SUM[AÁ]RIO DE URINA/i.test(txt)) byDate[d][t].urina = parseUrina(txt);
-        if (/HEMOGRAMA/i.test(txt))            Object.assign(byDate[d][t].exams, parseHemogram(txt));
+        if (/HEMOGRAMA/i.test(txt)) {
+            const h = parseHemogram(txt);
+            if (h.blast && toFloat(h.blast) > 0) hasBlast = true;
+            Object.assign(byDate[d][t].exams, h);
+        }
         Object.assign(byDate[d][t].exams, parseOtherExams(txt));
     }
 
@@ -362,7 +369,11 @@ function parseLaudo(text) {
         }
     }
 
-    return lines.length ? lines.join('\n') : 'Nenhum exame reconhecido.';
+    if (!lines.length) return 'Nenhum exame reconhecido.';
+    const BLAST_WARN = '****ATENÇÃO PARA PRESENÇA DE BLASTOS****';
+    if (hasBlast) lines.unshift(BLAST_WARN);
+    if (hasBlast) lines.push(BLAST_WARN);
+    return lines.join('\n');
 }
 
 function buildMainLine(date, time, e) {
