@@ -614,13 +614,13 @@ function parseBH(text) {
 // ── SEÇÃO 4: CALCULADORA DVA ─────────────────────────────────
 
 const DVA_DRUGS = [
-    { factor: 64,           unit: 'mcg/kg/min', needsWeight: true  },
-    { factor: 128,          unit: 'mcg/kg/min', needsWeight: true  },
-    { factor: 4000,         unit: 'mcg/kg/min', needsWeight: true  },
-    { factor: 200 / 60,     unit: 'mcg/min',    needsWeight: false },
-    { factor: 200,          unit: 'mcg/kg/min', needsWeight: true  },
-    { factor: 20 / 101 / 60, unit: 'UI/min',   needsWeight: false },
-    { factor: 40 / 102 / 60, unit: 'UI/min',   needsWeight: false },
+    { factor: 64,            unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.05, maxDose: 2    },
+    { factor: 128,           unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.05, maxDose: 2    },
+    { factor: 4000,          unit: 'mcg/kg/min', needsWeight: true,  minDose: 2.5,  maxDose: 20   },
+    { factor: 200 / 60,      unit: 'mcg/min',    needsWeight: false, minDose: 5,    maxDose: 200  },
+    { factor: 200,           unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.5,  maxDose: 10   },
+    { factor: 20 / 101 / 60, unit: 'UI/min',     needsWeight: false, minDose: 0.01, maxDose: 0.04 },
+    { factor: 40 / 102 / 60, unit: 'UI/min',     needsWeight: false, minDose: 0.01, maxDose: 0.04 },
 ];
 
 function calcDVA() {
@@ -637,7 +637,15 @@ function calcDVA() {
     } else {
         dose = rate * drug.factor;
     }
-    out.textContent = dose.toFixed(3).replace('.', ',') + ' ' + drug.unit;
+    const fmtR = n => parseFloat(n.toFixed(4)).toString().replace('.', ',');
+    const rangeStr = 'Faixa usual: ' + fmtR(drug.minDose) + '–' + fmtR(drug.maxDose) + ' ' + drug.unit;
+    let texto = dose.toFixed(3).replace('.', ',') + ' ' + drug.unit + '   —   ' + rangeStr;
+    if (dose < drug.minDose) {
+        texto += '\n⚠️ ATENÇÃO: dose abaixo da faixa usual!';
+    } else if (dose > drug.maxDose) {
+        texto += '\n⚠️ ATENÇÃO: dose acima da faixa usual!';
+    }
+    out.textContent = texto;
 }
 
 // ── SEÇÃO 5: ISR + SEDAÇÃO CONTÍNUA ─────────────────────────
