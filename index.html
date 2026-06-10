@@ -51,6 +51,15 @@
         @media (max-width: 768px) {
             .actions { flex-direction: column; }
         }
+        .calc-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+        .calc-row { display: flex; align-items: center; gap: 10px; }
+        .calc-row label { width: 160px; font-size: 13px; color: #555; flex-shrink: 0; }
+        .calc-row select, .calc-row input[type="number"] {
+            flex: 1; padding: 7px 10px; font-size: 13px;
+            border: 1px solid #d0d0d0; background: #fff;
+            font-family: inherit; outline: none;
+        }
+        .calc-row select:focus, .calc-row input[type="number"]:focus { border-color: #3949ab; }
     </style>
 </head>
 <body>
@@ -95,6 +104,51 @@
         <button class="secondary" onclick="copiarResultado('resultadoBH')">Copiar resultado</button>
     </div>
     <div class="resultado" id="resultadoBH">Nenhum dado extraído ainda.</div>
+</div>
+
+<!-- SEÇÃO 4: CALCULADORA DVA -->
+<div class="section">
+    <h3>Calculadora DVA</h3>
+    <p class="hint">Selecione a droga, informe peso e velocidade de infusão para converter ml/h em dose.</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>Droga</label>
+            <select id="dvaDroga" onchange="calcDVA()">
+                <option>Noradrenalina (4 amp + 234mL SG 5%)</option>
+                <option>Noradrenalina 2x (8 amp + 218mL SG 5%)</option>
+                <option>Dobutamina (4 amp + 170mL SG 5%)</option>
+                <option>Nitroglicerina (1 amp + 240mL SG 5%)</option>
+                <option>Nitroprussiato (1 amp + 248mL SG 5%)</option>
+                <option>Vasopressina (1 amp + 100mL SF 0,9%)</option>
+                <option>Vasopressina 2x (2 amp + 100mL SF 0,9%)</option>
+            </select>
+        </div>
+        <div class="calc-row" id="dvaPesoRow">
+            <label>Peso ideal (kg)</label>
+            <input type="number" id="dvaPeso" min="30" max="200" step="0.5" oninput="calcDVA()">
+        </div>
+        <div class="calc-row">
+            <label>Velocidade (ml/h)</label>
+            <input type="number" id="dvaRate" min="0" step="0.1" oninput="calcDVA()">
+        </div>
+    </div>
+    <div class="resultado" id="resultadoDVA">—</div>
+</div>
+
+<!-- SEÇÃO 5: ISR + SEDAÇÃO -->
+<div class="section">
+    <h3>ISR + Sedação Contínua</h3>
+    <p class="hint">Informe o peso ideal para calcular doses de intubação (bolus em mL) e sedação contínua (ml/h mín–máx).</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>Peso ideal (kg)</label>
+            <input type="number" id="isrPeso" min="30" max="200" step="0.5" oninput="calcISR()">
+        </div>
+    </div>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoISR')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoISR">Informe o peso para calcular.</div>
 </div>
 
 <footer></footer>
@@ -555,6 +609,98 @@ function parseBH(text) {
     const bhM   = text.match(/Balan[çc]o H[íi]drico:\s*([-\d\.,]+)/i);
     if (!admM && !elimM && !bhM) return 'Totais não encontrados.\nVerifique se o texto contém "Total de Volumes Administrados" e "Total de Volumes Eliminados".';
     return 'BH ' + day + ': Adm ' + clean(admM && admM[1]) + 'ml | Elim ' + clean(elimM && elimM[1]) + 'ml | Saldo ' + clean(bhM && bhM[1]) + 'ml';
+}
+
+// ── SEÇÃO 4: CALCULADORA DVA ─────────────────────────────────
+
+const DVA_DRUGS = [
+    { factor: 64,           unit: 'mcg/kg/min', needsWeight: true  },
+    { factor: 128,          unit: 'mcg/kg/min', needsWeight: true  },
+    { factor: 4000,         unit: 'mcg/kg/min', needsWeight: true  },
+    { factor: 200 / 60,     unit: 'mcg/min',    needsWeight: false },
+    { factor: 200,          unit: 'mcg/kg/min', needsWeight: true  },
+    { factor: 20 / 101 / 60, unit: 'UI/min',   needsWeight: false },
+    { factor: 40 / 102 / 60, unit: 'UI/min',   needsWeight: false },
+];
+
+function calcDVA() {
+    const drug = DVA_DRUGS[document.getElementById('dvaDroga').selectedIndex];
+    const rate = parseFloat(document.getElementById('dvaRate').value);
+    document.getElementById('dvaPesoRow').style.display = drug.needsWeight ? '' : 'none';
+    const out = document.getElementById('resultadoDVA');
+    if (isNaN(rate) || rate < 0) { out.textContent = '—'; return; }
+    let dose;
+    if (drug.needsWeight) {
+        const peso = parseFloat(document.getElementById('dvaPeso').value);
+        if (isNaN(peso) || peso <= 0) { out.textContent = 'Informe o peso.'; return; }
+        dose = (rate * drug.factor) / (peso * 60);
+    } else {
+        dose = rate * drug.factor;
+    }
+    out.textContent = dose.toFixed(3).replace('.', ',') + ' ' + drug.unit;
+}
+
+// ── SEÇÃO 5: ISR + SEDAÇÃO CONTÍNUA ─────────────────────────
+
+const ISR_PREMED = [
+    { name: 'Fentanil (sem diluição)',     conc: 50, unit: 'mcg/kg', doses: [1, 3],      note: 'resposta hemodinâmica à laringoscopia' },
+    { name: 'Lidocaína 2% (sem diluição)', conc: 20, unit: 'mg/kg',  doses: [1, 1.5],    note: 'broncoespasmo / HIC' },
+];
+
+const ISR_INDUCAO = [
+    { name: 'Propofol (sem diluição)',      conc: 10, unit: 'mg/kg', doses: [1.5, 2, 3],  note: 'evitar em instáveis hemodinâmicos' },
+    { name: 'Midazolam (1 amp + 12mL AD)', conc: 1,  unit: 'mg/kg', doses: [0.1, 0.3],   note: 'onset lento; evitar em broncoespasmo' },
+    { name: 'Etomidato (sem diluição)',     conc: 2,  unit: 'mg/kg', doses: [0.2, 0.3],   note: 'preferir em instáveis hemodinâmicos' },
+    { name: 'Ketamina (1 amp + 8mL AD)',    conc: 10, unit: 'mg/kg', doses: [1, 2],        note: 'preferir em broncoespasmo / choque' },
+];
+
+const ISR_BLOQ = [
+    { name: 'Succinilcolina (1 amp + 10mL AD)', conc: 10, unit: 'mg/kg', doses: [1.0, 1.5, 2.0], note: 'CI: hipercalemia, queimados, rabdomiólise, TRM' },
+    { name: 'Rocurônio (sem diluição)',          conc: 10, unit: 'mg/kg', doses: [0.6, 1.2, 1.5], note: 'reversível com sugamadex' },
+];
+
+const SEDACAO = [
+    { name: 'Fentanil (2 amp + 80mL SF 0,9%)',         conc: 10, unit: 'mcg/kg/h', min: 0.7,  max: 4.5  },
+    { name: 'Propofol (sem diluição)',                  conc: 10, unit: 'mg/kg/h',  min: 1.5,  max: 4.5  },
+    { name: 'Midazolam (10 amp + 120mL SG 5%)',         conc: 1,  unit: 'mg/kg/h',  min: 0.05, max: 0.10 },
+    { name: 'Dexmedetomidina (1 amp + 48mL SF 0,9%)',   conc: 4,  unit: 'mcg/kg/h', min: 0.20, max: 0.70 },
+];
+
+function calcISR() {
+    const peso = parseFloat(document.getElementById('isrPeso').value);
+    const out  = document.getElementById('resultadoISR');
+    if (isNaN(peso) || peso <= 0) { out.textContent = 'Informe o peso.'; return; }
+
+    const fmtN  = n => n.toFixed(1).replace('.', ',');
+    const fmtD  = d => String(d).replace('.', ',');
+    const pad   = (s, n) => s + ' '.repeat(Math.max(0, n - s.length));
+    const COL   = 36;
+    const drugLine = d => {
+        const parts = d.doses.map(dose => fmtD(dose) + ' ' + d.unit + ' = ' + fmtN(peso * dose / d.conc) + ' mL');
+        return pad(d.name + ':', COL) + parts.join('  |  ') + (d.note ? '   (' + d.note + ')' : '');
+    };
+    const lines = ['ISR — Peso: ' + peso + ' kg', ''];
+
+    lines.push('── PRÉ-MEDICAÇÃO (2–3 min antes, opcional) ──');
+    for (const d of ISR_PREMED) lines.push(drugLine(d));
+
+    lines.push('');
+    lines.push('── INDUÇÃO (escolher um) ──');
+    for (const d of ISR_INDUCAO) lines.push(drugLine(d));
+
+    lines.push('');
+    lines.push('── BLOQUEADOR NEUROMUSCULAR (escolher um) ──');
+    for (const d of ISR_BLOQ) lines.push(drugLine(d));
+
+    lines.push('');
+    lines.push('── SEDAÇÃO CONTÍNUA ──');
+    for (const s of SEDACAO) {
+        const minMl = fmtN(peso * s.min / s.conc);
+        const maxMl = fmtN(peso * s.max / s.conc);
+        lines.push(pad(s.name + ':', COL) + fmtD(s.min) + ' ' + s.unit + ' = ' + minMl + ' ml/h  —  ' + fmtD(s.max) + ' ' + s.unit + ' = ' + maxMl + ' ml/h');
+    }
+
+    out.textContent = lines.join('\n');
 }
 </script>
 </body>
