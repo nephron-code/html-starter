@@ -60,6 +60,13 @@
             font-family: inherit; outline: none;
         }
         .calc-row select:focus, .calc-row input[type="number"]:focus { border-color: #3949ab; }
+        .disclaimer {
+            max-width: 900px; margin: 0 auto 0; padding: 12px 20px;
+            background: #fff8e1; border-left: 4px solid #f9a825;
+            font-size: 12px; color: #555; line-height: 1.6;
+        }
+        .disclaimer strong { color: #333; }
+        .privacy-note { font-size: 11px; color: #aaa; margin: 4px 0 0; }
     </style>
 </head>
 <body>
@@ -70,10 +77,15 @@
     <p class="version">v0.1beta — cheque todos os dados transcritos</p>
 </header>
 
+<div class="disclaimer">
+    <strong>⚠️ Ferramenta de uso educativo.</strong> As informações apresentadas têm caráter auxiliar e devem ser verificadas em fontes primárias antes de qualquer aplicação clínica. <strong>Esta ferramenta não substitui o julgamento médico.</strong> Doses, diluições e intervalos de referência podem variar conforme protocolo institucional, características do paciente e atualização da literatura.
+</div>
+
 <!-- SEÇÃO 1: LABORATÓRIO -->
 <div class="section">
     <h3>Exames Laboratoriais</h3>
     <p class="hint">No AGHU, abra o Laudo Individual → Ctrl+A → Ctrl+C → clique na caixa abaixo → Ctrl+V → Extrair. Repita para cada data antes de extrair.</p>
+    <p class="privacy-note">🔒 Processamento local — nenhum dado é enviado a servidores externos.</p>
     <textarea id="textoLab" placeholder="Cole o laudo aqui..."></textarea>
     <div class="actions">
         <button onclick="extrairLab()">Extrair</button>
@@ -86,6 +98,7 @@
 <div class="section">
     <h3>Controles — Sinais Vitais</h3>
     <p class="hint">No AGHU, abra a Monitorização → Ctrl+A → Ctrl+C → clique na caixa abaixo → Ctrl+V → Extrair.</p>
+    <p class="privacy-note">🔒 Processamento local — nenhum dado é enviado a servidores externos.</p>
     <textarea id="textoControles" placeholder="Cole a monitorização aqui..."></textarea>
     <div class="actions">
         <button onclick="extrairControles()">Extrair</button>
@@ -98,6 +111,7 @@
 <div class="section">
     <h3>Balanço Hídrico</h3>
     <p class="hint">No AGHU, abra o Controle Hídrico → Ctrl+A → Ctrl+C → clique na caixa abaixo → Ctrl+V → Extrair.</p>
+    <p class="privacy-note">🔒 Processamento local — nenhum dado é enviado a servidores externos.</p>
     <textarea id="textoBH" placeholder="Cole o balanço hídrico aqui..."></textarea>
     <div class="actions">
         <button onclick="extrairBH()">Extrair</button>
@@ -657,7 +671,7 @@ const ISR_PREMED = [
 
 const ISR_INDUCAO = [
     { name: 'Propofol (sem diluição)',      conc: 10, unit: 'mg/kg', doses: [1.5, 2, 3],  note: 'evitar em instáveis hemodinâmicos' },
-    { name: 'Midazolam (1 amp + 12mL AD)', conc: 1,  unit: 'mg/kg', doses: [0.1, 0.3],   note: 'onset lento; evitar em broncoespasmo' },
+    { name: 'Midazolam (5mg/mL, sem diluição)', conc: 5, unit: 'mg/kg', doses: [0.1, 0.3], note: 'onset lento; evitar em broncoespasmo' },
     { name: 'Etomidato (sem diluição)',     conc: 2,  unit: 'mg/kg', doses: [0.2, 0.3],   note: 'preferir em instáveis hemodinâmicos' },
     { name: 'Ketamina (1 amp + 8mL AD)',    conc: 10, unit: 'mg/kg', doses: [1, 2],        note: 'preferir em broncoespasmo / choque' },
 ];
@@ -670,7 +684,8 @@ const ISR_BLOQ = [
 const SEDACAO = [
     { name: 'Fentanil (2 amp + 80mL SF 0,9%)',         conc: 10, unit: 'mcg/kg/h', min: 0.7,  max: 4.5  },
     { name: 'Propofol (sem diluição)',                  conc: 10, unit: 'mg/kg/h',  min: 1.5,  max: 4.5  },
-    { name: 'Midazolam (10 amp + 120mL SG 5%)',         conc: 1,  unit: 'mg/kg/h',  min: 0.05, max: 0.10 },
+    { name: 'Midazolam (conc. final 1mg/mL)',            conc: 1,  unit: 'mg/kg/h',  min: 0.05, max: 0.10,
+      prep: 'amp 3mL (15mg): 10 amp + 120mL SG 5%   |   amp 10mL (50mg): 1 amp + 40mL SG 5%' },
     { name: 'Dexmedetomidina (1 amp + 48mL SF 0,9%)',   conc: 4,  unit: 'mcg/kg/h', min: 0.20, max: 0.70 },
 ];
 
@@ -685,7 +700,9 @@ function calcISR() {
     const COL   = 36;
     const drugLine = d => {
         const parts = d.doses.map(dose => fmtD(dose) + ' ' + d.unit + ' = ' + fmtN(peso * dose / d.conc) + ' mL');
-        return pad(d.name + ':', COL) + parts.join('  |  ') + (d.note ? '   (' + d.note + ')' : '');
+        let line = pad(d.name + ':', COL) + parts.join('  |  ') + (d.note ? '   (' + d.note + ')' : '');
+        if (d.prep) line += '\n    → ' + d.prep;
+        return line;
     };
     const lines = ['ISR — Peso: ' + peso + ' kg', ''];
 
@@ -705,7 +722,9 @@ function calcISR() {
     for (const s of SEDACAO) {
         const minMl = fmtN(peso * s.min / s.conc);
         const maxMl = fmtN(peso * s.max / s.conc);
-        lines.push(pad(s.name + ':', COL) + fmtD(s.min) + ' ' + s.unit + ' = ' + minMl + ' ml/h  —  ' + fmtD(s.max) + ' ' + s.unit + ' = ' + maxMl + ' ml/h');
+        let sedLine = pad(s.name + ':', COL) + fmtD(s.min) + ' ' + s.unit + ' = ' + minMl + ' ml/h  —  ' + fmtD(s.max) + ' ' + s.unit + ' = ' + maxMl + ' ml/h';
+        if (s.prep) sedLine += '\n    → ' + s.prep;
+        lines.push(sedLine);
     }
 
     out.textContent = lines.join('\n');
