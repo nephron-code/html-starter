@@ -92,6 +92,7 @@
     <div class="actions">
         <button onclick="extrairLab()">Extrair</button>
         <button class="secondary" onclick="copiarResultado('resultadoLab')">Copiar resultado</button>
+        <button class="secondary" onclick="limparSecao('textoLab', 'resultadoLab')">Limpar</button>
     </div>
     <div class="resultado" id="resultadoLab">Nenhum dado extraído ainda.</div>
 </div>
@@ -105,6 +106,7 @@
     <div class="actions">
         <button onclick="extrairControles()">Extrair</button>
         <button class="secondary" onclick="copiarResultado('resultadoControles')">Copiar resultado</button>
+        <button class="secondary" onclick="limparSecao('textoControles', 'resultadoControles')">Limpar</button>
     </div>
     <div class="resultado" id="resultadoControles">Nenhum dado extraído ainda.</div>
 </div>
@@ -118,6 +120,7 @@
     <div class="actions">
         <button onclick="extrairBH()">Extrair</button>
         <button class="secondary" onclick="copiarResultado('resultadoBH')">Copiar resultado</button>
+        <button class="secondary" onclick="limparSecao('textoBH', 'resultadoBH')">Limpar</button>
     </div>
     <div class="resultado" id="resultadoBH">Nenhum dado extraído ainda.</div>
 </div>
@@ -185,6 +188,12 @@ function copiarResultado(id) {
     } else {
         fallbackCopy(text);
     }
+}
+
+function limparSecao(textareaId, resultadoId) {
+    document.getElementById(textareaId).value = '';
+    setResult(resultadoId, '');
+    document.getElementById(textareaId).focus();
 }
 
 function fallbackCopy(text) {
@@ -734,5 +743,10 @@ function calcISR() {
     out.textContent = lines.join('\n');
 }
 </script>
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

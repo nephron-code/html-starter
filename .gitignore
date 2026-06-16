@@ -1,5 +1,7 @@
 .DS_Store
 *.pdf
+node_modules/
+package-lock.json
 .omc/
 .claude/
 AUTOLABS ABC.html
