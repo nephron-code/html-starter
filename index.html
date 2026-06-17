@@ -125,7 +125,52 @@
     <div class="resultado" id="resultadoBH">Nenhum dado extraído ainda.</div>
 </div>
 
-<!-- SEÇÃO 4: CALCULADORA DVA -->
+<!-- SEÇÃO 4: GASOMETRIA -->
+<div class="section">
+    <h3>Gasometria — Interpretação Ácido-Base</h3>
+    <p class="hint">Informe pH, pCO2 e HCO3⁻ (obrigatórios). Na⁺, Cl⁻, K⁺, albumina e lactato são opcionais — ampliam a interpretação.</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>pH</label>
+            <input type="number" id="gasoPhVal" min="6.5" max="7.9" step="0.01" placeholder="ex: 7.30" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>pCO2 (mmHg)</label>
+            <input type="number" id="gasoPco2Val" min="5" max="150" step="0.1" placeholder="ex: 40" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>HCO3⁻ (mEq/L)</label>
+            <input type="number" id="gasoHco3Val" min="2" max="60" step="0.1" placeholder="ex: 24" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>Na⁺ (mEq/L) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="gasoNaVal" min="100" max="200" step="0.1" placeholder="para ânion-gap" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>Cl⁻ (mEq/L) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="gasoClVal" min="60" max="160" step="0.1" placeholder="para ânion-gap" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>K⁺ (mEq/L) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="gasoKVal" min="1" max="10" step="0.1" placeholder="registro" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>Albumina (g/dL) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="gasoAlbVal" min="0.5" max="6" step="0.1" placeholder="para AG corrigido" oninput="interpretarGaso()">
+        </div>
+        <div class="calc-row">
+            <label>Lactato (mmol/L) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="gasoLacVal" min="0.1" max="30" step="0.1" placeholder="para caracterizar AGMA" oninput="interpretarGaso()">
+        </div>
+    </div>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoGaso')">Copiar resultado</button>
+        <button class="secondary" onclick="limparGaso()">Limpar</button>
+    </div>
+    <div class="resultado" id="resultadoGaso">Informe pH, pCO2 e HCO3⁻ para interpretar.</div>
+</div>
+
+<!-- SEÇÃO 5: CALCULADORA DVA -->
 <div class="section">
     <h3>Calculadora DVA</h3>
     <p class="hint">Selecione a droga, informe peso e velocidade de infusão para converter ml/h em dose.</p>
@@ -154,7 +199,7 @@
     <div class="resultado" id="resultadoDVA">—</div>
 </div>
 
-<!-- SEÇÃO 5: ISR + SEDAÇÃO -->
+<!-- SEÇÃO 6: ISR + SEDAÇÃO -->
 <div class="section">
     <h3>ISR + Sedação Contínua</h3>
     <p class="hint">Informe o peso ideal para calcular doses de intubação (bolus em mL) e sedação contínua (ml/h mín–máx).</p>
@@ -741,6 +786,280 @@ function calcISR() {
     }
 
     out.textContent = lines.join('\n');
+}
+
+// ── SEÇÃO 4: GASOMETRIA ──────────────────────────────────────
+
+function fmt1(n) {
+    return parseFloat(n.toFixed(1)).toString().replace('.', ',');
+}
+
+function limparGaso() {
+    ['gasoPhVal','gasoPco2Val','gasoHco3Val','gasoNaVal','gasoClVal',
+     'gasoKVal','gasoAlbVal','gasoLacVal'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    setResult('resultadoGaso', 'Informe pH, pCO2 e HCO3⁻ para interpretar.');
+}
+
+function classifyAcidBase(inp) {
+    const pH_LO = 7.35, pH_HI = 7.45, PCO2_REF = 40, HCO3_REF = 24, AG_NORM = 12, ALB_REF = 4.0, LAC_NORM = 2.0;
+    const COMP_TOL = 2; // ±2 mEq/L tolerance for respiratory compensation
+    const { ph, pco2, hco3, na, cl, alb, lac } = inp;
+    const notes = [];
+    let phStatus, primary, comp = null;
+
+    // Passo 1 — pH
+    if      (ph < pH_LO) phStatus = 'acidemia';
+    else if (ph > pH_HI) phStatus = 'alcalemia';
+    else                 phStatus = 'normal';
+
+    // Passo 2 — Distúrbio primário (C1 fix: concordância direcional com baseline 40/24)
+    if (phStatus === 'acidemia') {
+        const hasMet  = hco3 < HCO3_REF;
+        const hasResp = pco2 > PCO2_REF;
+        if (hasMet && hasResp) {
+            const relMet  = (HCO3_REF - hco3) / HCO3_REF;
+            const relResp = (pco2 - PCO2_REF) / PCO2_REF;
+            primary = relMet >= relResp ? 'acidose_metabolica' : 'acidose_respiratoria';
+            notes.push('Ambos componentes em direção acidótica — primário determinado pela magnitude do desvio');
+        } else if (hasMet)  { primary = 'acidose_metabolica';  }
+        else if (hasResp)   { primary = 'acidose_respiratoria'; }
+        else                { primary = 'indeterminado'; notes.push('pH acidêmico com pCO2 < 40 e HCO3 > 24 — verificar consistência dos valores'); }
+    } else if (phStatus === 'alcalemia') {
+        const hasMet  = hco3 > HCO3_REF;
+        const hasResp = pco2 < PCO2_REF;
+        if (hasMet && hasResp) {
+            const relMet  = (hco3 - HCO3_REF) / HCO3_REF;
+            const relResp = (PCO2_REF - pco2) / PCO2_REF;
+            primary = relMet >= relResp ? 'alcalose_metabolica' : 'alcalose_respiratoria';
+            notes.push('Ambos componentes em direção alcalótica — primário determinado pela magnitude do desvio');
+        } else if (hasMet)  { primary = 'alcalose_metabolica';  }
+        else if (hasResp)   { primary = 'alcalose_respiratoria'; }
+        else                { primary = 'indeterminado'; notes.push('pH alcalêmico com pCO2 > 40 e HCO3 < 24 — verificar consistência dos valores'); }
+    } else {
+        primary = 'normal';
+        if (Math.abs(pco2 - PCO2_REF) > 5 || Math.abs(hco3 - HCO3_REF) > 3) {
+            notes.push('pH normal com pCO2/HCO3 alterados — possível distúrbio misto compensado; avaliar ânion-gap');
+        }
+    }
+
+    // Passo 3 — Compensação esperada
+    if (primary === 'acidose_metabolica') {
+        const exp    = 1.5 * hco3 + 8;
+        const lo = exp - 2, hi = exp + 2;
+        comp = { formula: 'Winter: pCO2 = 1,5×HCO3 + 8 ± 2', expected: fmt1(lo) + '–' + fmt1(hi) + ' mmHg' };
+        if      (pco2 >= lo && pco2 <= hi) { comp.status = 'adequada'; }
+        else if (pco2 >  hi)               { comp.status = 'insuficiente'; comp.extra = 'acidose respiratória associada (pCO2 acima do esperado)'; }
+        else                               { comp.status = 'excessiva';    comp.extra = 'alcalose respiratória associada (pCO2 abaixo do esperado)'; }
+    } else if (primary === 'alcalose_metabolica') {
+        const exp = 40 + 0.7 * (hco3 - HCO3_REF);
+        const lo = exp - 5, hi = exp + 5;
+        comp = { formula: 'pCO2 = 40 + 0,7×(HCO3 − 24) ± 5', expected: fmt1(lo) + '–' + fmt1(hi) + ' mmHg' };
+        if      (pco2 >= lo && pco2 <= hi) { comp.status = 'adequada'; }
+        else if (pco2 <  lo)               { comp.status = 'insuficiente'; comp.extra = 'alcalose respiratória associada (pCO2 abaixo do esperado)'; }
+        else                               { comp.status = 'excessiva';    comp.extra = 'acidose respiratória associada (pCO2 acima do esperado)'; }
+    } else if (primary === 'acidose_respiratoria') {
+        const d  = pco2 - PCO2_REF;
+        const hA = HCO3_REF + 1.0 * d / 10;
+        const hC = HCO3_REF + 3.5 * d / 10;
+        comp = { formula: 'HCO3 agudo = 24 + 1,0×ΔpCO2/10  |  crônico = 24 + 3,5×ΔpCO2/10',
+                 hco3_agudo: fmt1(hA), hco3_cronico: fmt1(hC) };
+        if      (hco3 >= hC + COMP_TOL)                        { comp.timing = 'acima do esperado crônico'; comp.extra = 'alcalose metabólica associada'; }
+        else if (hco3 >= hC - COMP_TOL)                        { comp.timing = 'compatível com crônica'; }
+        else if (hco3 >  hA + COMP_TOL)                        { comp.timing = 'entre aguda e crônica'; }
+        else if (hco3 >= hA - COMP_TOL)                        { comp.timing = 'compatível com aguda'; }
+        else                                                    { comp.timing = 'abaixo do esperado agudo'; comp.extra = 'acidose metabólica associada'; }
+    } else if (primary === 'alcalose_respiratoria') {
+        const d  = PCO2_REF - pco2;
+        const hA = HCO3_REF - 2.0 * d / 10;
+        const hC = HCO3_REF - 4.0 * d / 10;
+        comp = { formula: 'HCO3 agudo = 24 − 2,0×ΔpCO2/10  |  crônico = 24 − 4,0×ΔpCO2/10',
+                 hco3_agudo: fmt1(hA), hco3_cronico: fmt1(hC) };
+        if      (hco3 <= hC - COMP_TOL)                        { comp.timing = 'abaixo do esperado crônico'; comp.extra = 'acidose metabólica associada'; }
+        else if (hco3 <= hC + COMP_TOL)                        { comp.timing = 'compatível com crônica'; }
+        else if (hco3 <  hA - COMP_TOL)                        { comp.timing = 'entre aguda e crônica'; }
+        else if (hco3 <= hA + COMP_TOL)                        { comp.timing = 'compatível com aguda'; }
+        else                                                    { comp.timing = 'acima do esperado agudo'; comp.extra = 'alcalose metabólica associada'; }
+    }
+
+    // Passo 4 — Ânion-gap
+    let ag = null, ag_corr = null, ag_eff = null;
+    if (na !== null && cl !== null) {
+        ag = na - (cl + hco3);
+        ag_eff = ag;
+        if (alb !== null) {
+            ag_corr = ag + 2.5 * (ALB_REF - alb);
+            ag_eff = ag_corr;
+        }
+    }
+    const agma = ag_eff !== null && ag_eff > AG_NORM;
+    if (primary === 'normal' && agma) {
+        notes.push('pH normal com AG alto — AGMA presente, possivelmente mascarado por distúrbio alcalótico coexistente');
+    }
+
+    // Passo 5 — Delta-delta (só se AGMA)
+    let delta = null;
+    if (agma) {
+        const dAG   = ag_eff - AG_NORM;
+        const dHCO3 = HCO3_REF - hco3;
+        const hco3c = hco3 + dAG;
+        if (dHCO3 <= 0) {
+            delta = { dAG: fmt1(dAG), dHCO3: '≤0', ratio: '≫2',
+                      label: 'AGMA + alcalose metabólica associada (HCO3 ≥ 24)',
+                      hco3c: fmt1(hco3c), hco3c_note: '' };
+        } else {
+            const r = dAG / dHCO3;
+            let label;
+            // C2 fix: faixas contíguas sem lacuna
+            if      (r < 0.4)  label = 'NAGMA predominante (acidose hiperclorêmica)';
+            else if (r < 1.0)  label = 'mista: AGMA + acidose sem AG (hiperclorêmica)';
+            else if (r <= 2.0) label = 'AGMA pura';
+            else               label = 'AGMA + alcalose metabólica associada (ou HCO3 prévio elevado)';
+            const hco3c_note = hco3c > 26 ? ' → alcalose metabólica associada' :
+                               hco3c < 22 ? ' → acidose sem AG associada' : '';
+            delta = { dAG: fmt1(dAG), dHCO3: fmt1(dHCO3), ratio: r.toFixed(2).replace('.', ','),
+                      label, hco3c: fmt1(hco3c), hco3c_note };
+        }
+    }
+
+    // Passo 5b — Lactato (só se AGMA e lactato informado)
+    let lacNote = null;
+    if (agma && lac !== null) {
+        const dAG     = ag_eff - AG_NORM;
+        const lacExc  = lac - LAC_NORM;
+        if (lac <= LAC_NORM) {
+            lacNote = 'Lactato ' + fmt1(lac) + ' mmol/L (normal) com AG alto → gap não-láctico — considerar cetoácidos, uremia, toxinas (cetoacidose, salicilato, metanol/etilenoglicol)';
+        } else if (Math.abs(lacExc - dAG) <= 5) {
+            lacNote = 'Lactato ' + fmt1(lac) + ' mmol/L — elevação lática (Lac−2 = ' + fmt1(lacExc) + ') ≈ ΔAG (' + fmt1(dAG) + ') → acidose láctica explica o gap';
+        } else if (dAG > lacExc + 5) {
+            lacNote = 'Lactato ' + fmt1(lac) + ' mmol/L — elevação lática (Lac−2 = ' + fmt1(lacExc) + ') explica apenas parte do ΔAG (' + fmt1(dAG) + ') → outro ânion não medido coexistindo';
+        } else {
+            lacNote = 'Lactato ' + fmt1(lac) + ' mmol/L elevado — relação com ΔAG (' + fmt1(dAG) + ') inconclusiva';
+        }
+    }
+
+    return { phStatus, primary, comp, ag, ag_corr, ag_eff, agma, delta, lacNote, notes };
+}
+
+function formatGasoInterpretation(r, inp) {
+    const LABEL = {
+        acidose_metabolica:   'Acidose metabólica',
+        acidose_respiratoria: 'Acidose respiratória',
+        alcalose_metabolica:  'Alcalose metabólica',
+        alcalose_respiratoria:'Alcalose respiratória',
+        normal:               'Sem distúrbio primário',
+        indeterminado:        'Indeterminado'
+    };
+    const fmtV = v => String(v).replace('.', ',');
+    const lines = [];
+
+    lines.push('pH ' + fmtV(inp.ph) + '  pCO2 ' + fmtV(inp.pco2) + '  HCO3 ' + fmtV(inp.hco3));
+    lines.push('');
+
+    // pH status + primário
+    const phTag = r.phStatus === 'acidemia' ? 'Acidemia' : r.phStatus === 'alcalemia' ? 'Alcalemia' : 'pH normal';
+    lines.push(phTag + ' → ' + (LABEL[r.primary] || r.primary));
+    for (const n of r.notes) lines.push('⚠ ' + n);
+
+    // Compensação
+    const c = r.comp;
+    if (c) {
+        lines.push('');
+        lines.push('── Compensação esperada ──');
+        lines.push(c.formula);
+        if (c.expected) {
+            const tag = c.status === 'adequada' ? '✓ adequada' : '✗ ' + c.status;
+            lines.push('pCO2 esperado: ' + c.expected + '  |  medido: ' + fmtV(inp.pco2) + ' mmHg  → ' + tag);
+        }
+        if (c.hco3_agudo) {
+            lines.push('HCO3 agudo esperado:   ' + c.hco3_agudo + ' mEq/L');
+            lines.push('HCO3 crônico esperado: ' + c.hco3_cronico + ' mEq/L');
+            lines.push('HCO3 medido: ' + fmtV(inp.hco3) + ' mEq/L  → ' + c.timing);
+        }
+        if (c.extra) lines.push('⚠ ' + c.extra);
+    }
+
+    // Ânion-gap
+    lines.push('');
+    lines.push('── Ânion-gap ──');
+    if (r.ag !== null) {
+        lines.push('AG = ' + fmt1(r.ag) + ' mEq/L  (Na − Cl − HCO3; normal 8–12)');
+        if (r.ag_corr !== null) {
+            lines.push('AG corrigido (alb ' + fmtV(inp.alb) + ' g/dL): ' + fmt1(r.ag_corr) + ' mEq/L');
+        } else {
+            lines.push('Albumina não informada — AG sem correção');
+        }
+        const eff = r.ag_eff;
+        if (eff > 12) {
+            lines.push('→ AG ALTO (' + fmt1(eff) + ') — AGMA presente');
+        } else {
+            lines.push('→ AG normal — sem acidose por ânion-gap');
+        }
+    } else {
+        lines.push('Na⁺ e/ou Cl⁻ não informados — ânion-gap não calculado');
+    }
+
+    // Delta-delta
+    if (r.delta) {
+        const d = r.delta;
+        lines.push('');
+        lines.push('── Delta-delta ──');
+        lines.push('ΔAG = ' + d.dAG + '  |  ΔHCO3 = ' + d.dHCO3 + '  |  razão = ' + d.ratio);
+        lines.push('→ ' + d.label);
+        lines.push('HCO3 corrigido = ' + d.hco3c + ' mEq/L' + d.hco3c_note);
+    }
+
+    // Lactato
+    if (r.lacNote) {
+        lines.push('');
+        lines.push('── Caracterização do AGMA ──');
+        lines.push(r.lacNote);
+    }
+
+    // Síntese
+    lines.push('');
+    lines.push('── Síntese ──');
+    const syn = [];
+    if (r.primary !== 'normal' && r.primary !== 'indeterminado') syn.push(LABEL[r.primary]);
+    else if (r.agma) syn.push('AGMA com pH normal (distúrbio misto)');
+    else syn.push('Sem distúrbio ácido-base identificado');
+    if (c) {
+        if (c.status === 'adequada') syn.push('compensação adequada');
+        else if (c.extra)            syn.push(c.extra);
+        if (c.timing)                syn.push(c.timing);
+    }
+    if (r.delta) syn.push('delta-delta ' + r.delta.ratio + ' → ' + r.delta.label);
+    lines.push(syn.join('; '));
+
+    lines.push('');
+    lines.push('⚠ Classificatório — não substitui julgamento clínico.');
+    return lines.join('\n');
+}
+
+function interpretarGaso() {
+    const ph   = toFloat(document.getElementById('gasoPhVal').value);
+    const pco2 = toFloat(document.getElementById('gasoPco2Val').value);
+    const hco3 = toFloat(document.getElementById('gasoHco3Val').value);
+    if (isNaN(ph) || isNaN(pco2) || isNaN(hco3)) {
+        setResult('resultadoGaso', 'Informe pH, pCO2 e HCO3⁻ para interpretar.');
+        return;
+    }
+    if (ph < 6.5 || ph > 7.9)     { setResult('resultadoGaso', '⚠ pH fora de faixa plausível (6,5–7,9).'); return; }
+    if (pco2 < 5  || pco2 > 150)  { setResult('resultadoGaso', '⚠ pCO2 fora de faixa plausível (5–150 mmHg).'); return; }
+    if (hco3 < 2  || hco3 > 60)   { setResult('resultadoGaso', '⚠ HCO3 fora de faixa plausível (2–60 mEq/L).'); return; }
+    const na  = toFloat(document.getElementById('gasoNaVal').value);
+    const cl  = toFloat(document.getElementById('gasoClVal').value);
+    const alb = toFloat(document.getElementById('gasoAlbVal').value);
+    const lac = toFloat(document.getElementById('gasoLacVal').value);
+    const inp = { ph, pco2, hco3,
+        na:  isNaN(na)  ? null : na,
+        cl:  isNaN(cl)  ? null : cl,
+        alb: isNaN(alb) ? null : alb,
+        lac: isNaN(lac) ? null : lac
+    };
+    const r = classifyAcidBase(inp);
+    setResult('resultadoGaso', formatGasoInterpretation(r, inp));
 }
 </script>
 <!-- Vercel Web Analytics -->
