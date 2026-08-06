@@ -109,9 +109,22 @@
         details.algo > summary:hover { background: #f0f0f0; }
         .algo-body { padding: 0 12px 12px; }
         .fluxo-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .fluxo-wrap svg { display: block; min-width: 1000px; width: 100%; height: auto; }
+        .fluxo-wrap svg { display: block; width: 100%; height: auto; }
+        /* Telas largas: o diagrama sai do limite de 900px da seção e ocupa a janela,
+           renderizando em escala ~1:1 sem barra de rolagem. */
+        @media (min-width: 940px) {
+            details.algo {
+                width: min(1240px, calc(100vw - 48px));
+                margin-left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        /* Telas estreitas: encolher para caber deixaria a fonte ilegível — rola na horizontal. */
+        @media (max-width: 939px) {
+            .fluxo-wrap svg { min-width: 880px; }
+        }
         .algo-nota { font-size: 12px; color: #666; line-height: 1.6; margin: 12px 0 0;
-                     border-left: 3px solid #d0d0d0; padding-left: 10px; }
+                     max-width: 900px; border-left: 3px solid #d0d0d0; padding-left: 10px; }
         .algo-nota strong { color: #333; }
     </style>
 </head>
@@ -243,89 +256,89 @@
         <summary>Hiponatremia — abordagem diagnóstica</summary>
         <div class="algo-body">
             <div class="fluxo-wrap">
-<svg viewBox="0 0 1160 645" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img" aria-label="Algoritmo diagnóstico da hiponatremia">
+<svg viewBox="0 0 990 640" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img" aria-label="Algoritmo diagnóstico da hiponatremia">
 <defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#707070"/></marker></defs>
-<rect x="475" y="8" width="210" height="32" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
-<text x="580" y="29" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1a237e">HIPONATREMIA</text>
-<line x1="580" y1="40" x2="580" y2="62" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<rect x="455" y="62" width="250" height="32" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
-<text x="580" y="83" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1a237e">Osmolalidade sérica</text>
-<line x1="580" y1="94" x2="580" y2="112" stroke="#707070" stroke-width="1.4"/>
-<line x1="190" y1="112" x2="970" y2="112" stroke="#707070" stroke-width="1.4"/>
-<line x1="190" y1="112" x2="190" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="580" y1="112" x2="580" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="970" y1="112" x2="970" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<text x="190" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Normal</text>
-<text x="190" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(280–295 mOsm/kg)</text>
-<line x1="190" y1="178" x2="190" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<text x="580" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Baixa</text>
-<text x="580" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(&lt; 280 mOsm/kg)</text>
-<line x1="580" y1="178" x2="580" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<text x="970" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Alta</text>
-<text x="970" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(&gt; 295 mOsm/kg)</text>
-<line x1="970" y1="178" x2="970" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<rect x="20" y="200" width="340" height="112" rx="2" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
-<text x="32" y="222" text-anchor="start" font-size="12.5" font-weight="600" fill="#4527a0">Hiponatremia isotônica</text>
-<text x="32" y="239" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#4527a0">(pseudo-hiponatremia)</text>
-<text x="32" y="256" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Hiperproteinemia</text>
-<text x="32" y="273" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hiperlipidemia (quilomícrons,</text>
-<text x="46" y="290" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">triglicérides, raramente colesterol)</text>
-<rect x="480" y="200" width="200" height="62" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-<text x="580" y="224" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">Hiponatremia</text>
-<text x="580" y="244" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">hipotônica</text>
-<rect x="800" y="200" width="340" height="112" rx="2" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
-<text x="812" y="222" text-anchor="start" font-size="12.5" font-weight="600" fill="#1b5e20">Hiponatremia hipertônica</text>
-<text x="812" y="239" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#1b5e20">(translocacional)</text>
-<text x="812" y="256" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Hiperglicemia</text>
-<text x="812" y="273" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Manitol, sorbitol, glicerol, maltose</text>
-<text x="812" y="290" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Contrastes radiológicos</text>
-<line x1="580" y1="262" x2="580" y2="292" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<rect x="470" y="292" width="220" height="32" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-<text x="580" y="313" text-anchor="middle" font-size="12.5" font-weight="600" fill="#bf360c">Estado volêmico</text>
-<line x1="580" y1="324" x2="580" y2="348" stroke="#707070" stroke-width="1.4"/>
-<line x1="250" y1="348" x2="1030" y2="348" stroke="#707070" stroke-width="1.4"/>
-<line x1="250" y1="348" x2="250" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="720" y1="348" x2="720" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="1030" y1="348" x2="1030" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<text x="250" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Hipovolêmica</text>
-<text x="720" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Euvolêmica</text>
-<text x="1030" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Hipervolêmica</text>
-<line x1="250" y1="396" x2="135" y2="438" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="250" y1="396" x2="390" y2="438" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="720" y1="396" x2="720" y2="440" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<line x1="1030" y1="396" x2="1030" y2="440" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
-<rect x="20" y="442" width="230" height="112" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-<text x="32" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Na⁺ urinário &lt; 10 mEq/L</text>
-<text x="32" y="481" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#bf360c">Perda extrarrenal de sal</text>
-<text x="32" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Desidratação</text>
-<text x="32" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Diarreia</text>
-<text x="32" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Vômitos</text>
-<rect x="265" y="442" width="250" height="180" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-<text x="277" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Na⁺ urinário &gt; 20 mEq/L</text>
-<text x="277" y="481" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#bf360c">Perda renal de sal</text>
-<text x="277" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Diuréticos</text>
-<text x="277" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. IECA</text>
-<text x="277" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Nefropatias</text>
-<text x="277" y="549" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Deficiência de</text>
-<text x="291" y="566" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">mineralocorticoide</text>
-<text x="277" y="583" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">5. Síndrome cerebral</text>
-<text x="291" y="600" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">perdedora de sal</text>
-<rect x="545" y="442" width="350" height="180" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-<text x="557" y="464" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. SIADH</text>
-<text x="557" y="481" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hiponatremia pós-operatória</text>
-<text x="557" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Hipotireoidismo</text>
-<text x="557" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Polidipsia psicogênica</text>
-<text x="557" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">5. Potomania por cerveja</text>
-<text x="557" y="549" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">6. Reação idiossincrásica a drogas</text>
-<text x="571" y="566" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">(tiazídicos, IECA)</text>
-<text x="557" y="583" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">7. Exercício de endurance</text>
-<text x="557" y="600" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">8. Deficiência de ACTH</text>
-<rect x="915" y="442" width="225" height="112" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-<text x="927" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Estados edematosos</text>
-<text x="927" y="481" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Insuficiência cardíaca</text>
-<text x="927" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hepatopatia</text>
-<text x="927" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Síndrome nefrótica (rara)</text>
-<text x="927" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Doença renal avançada</text>
+<rect x="390" y="8" width="210" height="32" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="495" y="29" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1a237e">HIPONATREMIA</text>
+<line x1="495" y1="40" x2="495" y2="62" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="370" y="62" width="250" height="32" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="495" y="83" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1a237e">Osmolalidade sérica</text>
+<line x1="495" y1="94" x2="495" y2="112" stroke="#707070" stroke-width="1.4"/>
+<line x1="160" y1="112" x2="830" y2="112" stroke="#707070" stroke-width="1.4"/>
+<line x1="160" y1="112" x2="160" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="495" y1="112" x2="495" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="830" y1="112" x2="830" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="160" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Normal</text>
+<text x="160" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(280–295 mOsm/kg)</text>
+<line x1="160" y1="178" x2="160" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="495" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Baixa</text>
+<text x="495" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(&lt; 280 mOsm/kg)</text>
+<line x1="495" y1="178" x2="495" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="830" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Alta</text>
+<text x="830" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(&gt; 295 mOsm/kg)</text>
+<line x1="830" y1="178" x2="830" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="10" y="200" width="300" height="112" rx="2" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+<text x="22" y="222" text-anchor="start" font-size="12.5" font-weight="600" fill="#4527a0">Hiponatremia isotônica</text>
+<text x="22" y="239" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#4527a0">(pseudo-hiponatremia)</text>
+<text x="22" y="256" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Hiperproteinemia</text>
+<text x="22" y="273" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hiperlipidemia (quilomícrons,</text>
+<text x="36" y="290" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">triglicérides, raramente colesterol)</text>
+<rect x="395" y="200" width="200" height="62" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="495" y="224" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">Hiponatremia</text>
+<text x="495" y="244" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">hipotônica</text>
+<rect x="680" y="200" width="300" height="112" rx="2" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="692" y="222" text-anchor="start" font-size="12.5" font-weight="600" fill="#1b5e20">Hiponatremia hipertônica</text>
+<text x="692" y="239" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#1b5e20">(translocacional)</text>
+<text x="692" y="256" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Hiperglicemia</text>
+<text x="692" y="273" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Manitol, sorbitol, glicerol, maltose</text>
+<text x="692" y="290" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Contrastes radiológicos</text>
+<line x1="495" y1="262" x2="495" y2="292" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="385" y="292" width="220" height="32" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="495" y="313" text-anchor="middle" font-size="12.5" font-weight="600" fill="#bf360c">Estado volêmico</text>
+<line x1="495" y1="324" x2="495" y2="348" stroke="#707070" stroke-width="1.4"/>
+<line x1="221" y1="348" x2="880" y2="348" stroke="#707070" stroke-width="1.4"/>
+<line x1="221" y1="348" x2="221" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="615" y1="348" x2="615" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="880" y1="348" x2="880" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="221" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Hipovolêmica</text>
+<text x="615" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Euvolêmica</text>
+<text x="880" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Hipervolêmica</text>
+<line x1="221" y1="396" x2="110" y2="438" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="221" y1="396" x2="332" y2="438" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="615" y1="396" x2="615" y2="440" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="880" y1="396" x2="880" y2="440" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="10" y="442" width="200" height="112" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="22" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Na⁺ urinário &lt; 10 mEq/L</text>
+<text x="22" y="481" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#bf360c">Perda extrarrenal de sal</text>
+<text x="22" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Desidratação</text>
+<text x="22" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Diarreia</text>
+<text x="22" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Vômitos</text>
+<rect x="225" y="442" width="215" height="180" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="237" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Na⁺ urinário &gt; 20 mEq/L</text>
+<text x="237" y="481" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#bf360c">Perda renal de sal</text>
+<text x="237" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Diuréticos</text>
+<text x="237" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. IECA</text>
+<text x="237" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Nefropatias</text>
+<text x="237" y="549" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Deficiência de</text>
+<text x="251" y="566" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">mineralocorticoide</text>
+<text x="237" y="583" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">5. Síndrome cerebral</text>
+<text x="251" y="600" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">perdedora de sal</text>
+<rect x="470" y="442" width="290" height="180" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="482" y="464" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. SIADH</text>
+<text x="482" y="481" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hiponatremia pós-operatória</text>
+<text x="482" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Hipotireoidismo</text>
+<text x="482" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Polidipsia psicogênica</text>
+<text x="482" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">5. Potomania por cerveja</text>
+<text x="482" y="549" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">6. Reação idiossincrásica a drogas</text>
+<text x="496" y="566" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">(tiazídicos, IECA)</text>
+<text x="482" y="583" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">7. Exercício de endurance</text>
+<text x="482" y="600" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">8. Deficiência de ACTH</text>
+<rect x="780" y="442" width="200" height="112" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="792" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Estados edematosos</text>
+<text x="792" y="481" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Insuficiência cardíaca</text>
+<text x="792" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hepatopatia</text>
+<text x="792" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Síndrome nefrótica (rara)</text>
+<text x="792" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Doença renal avançada</text>
 </svg>
             </div>
             <p class="algo-nota"><strong>Além do fluxograma:</strong> a osmolalidade urinária separa o que o
