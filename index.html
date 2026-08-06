@@ -204,6 +204,151 @@
 <!-- ═══ ABA: GASOMETRIA ═══ -->
 <div class="tab-panel" id="aba-gasometria" role="tabpanel">
 
+<!-- SEÇÃO 12: ALGORITMO ÁCIDO-BASE -->
+<div class="section">
+    <details class="algo">
+        <summary>Distúrbio ácido-base — abordagem por passos</summary>
+        <div class="algo-body">
+            <div class="fluxo-wrap">
+<svg viewBox="0 0 990 962" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img" aria-label="Algoritmo de interpretação ácido-base">
+<defs><marker id="s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#707070"/></marker></defs>
+<rect x="10" y="8" width="970" height="24" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="20" y="24" text-anchor="start" font-size="11.5" font-weight="700" fill="#1a237e">PASSO 1</text>
+<text x="82" y="24" text-anchor="start" font-size="11.5" font-weight="600" fill="#1a237e">— pH: há acidemia ou alcalemia?</text>
+<rect x="10" y="44" width="235" height="52" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="20" y="62" text-anchor="start" font-size="11.5" font-weight="700" fill="#bf360c">pH &lt; 7,35</text>
+<text x="20" y="77" text-anchor="start" font-size="10.5" font-weight="600" fill="#bf360c">ACIDEMIA</text>
+<rect x="255" y="44" width="235" height="52" rx="2" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="265" y="62" text-anchor="start" font-size="11.5" font-weight="700" fill="#0d47a1">pH &gt; 7,45</text>
+<text x="265" y="77" text-anchor="start" font-size="10.5" font-weight="600" fill="#0d47a1">ALCALEMIA</text>
+<rect x="500" y="44" width="480" height="52" rx="2" fill="#f7f7f7" stroke="#9e9e9e" stroke-width="1.5"/>
+<text x="510" y="62" text-anchor="start" font-size="10.5" font-weight="600" fill="#424242">pH 7,35–7,45 NÃO exclui distúrbio.</text>
+<text x="510" y="77" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Com pCO₂ ou HCO₃⁻ alterados: misto ou compensado —</text>
+<text x="510" y="92" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">seguir os passos. Use 7,40 como pivô para o primário.</text>
+<rect x="10" y="112" width="970" height="24" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="20" y="128" text-anchor="start" font-size="11.5" font-weight="700" fill="#1a237e">PASSO 2</text>
+<text x="82" y="128" text-anchor="start" font-size="11.5" font-weight="600" fill="#1a237e">— distúrbio primário e compensação esperada</text>
+<rect x="10" y="148" width="235" height="116" rx="2" fill="#ffebee" stroke="#c62828" stroke-width="1.5"/>
+<text x="20" y="166" text-anchor="start" font-size="11.5" font-weight="700" fill="#b71c1c">ACIDOSE RESPIRATÓRIA</text>
+<text x="20" y="181" text-anchor="start" font-size="10" font-weight="600" fill="#b71c1c" font-style="italic">pCO₂ &gt; 45 mmHg</text>
+<text x="20" y="196" text-anchor="start" font-size="10.5" font-weight="600" fill="#b71c1c">HCO₃⁻ esperado:</text>
+<text x="20" y="211" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">aguda:   24 + 1,0 × ΔpCO₂/10</text>
+<text x="20" y="226" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">crônica: 24 + 3,5 × ΔpCO₂/10</text>
+<text x="20" y="241" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">(ΔpCO₂ = pCO₂ − 40)</text>
+<rect x="255" y="148" width="235" height="116" rx="2" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="265" y="166" text-anchor="start" font-size="11.5" font-weight="700" fill="#1b5e20">ALCALOSE RESPIRATÓRIA</text>
+<text x="265" y="181" text-anchor="start" font-size="10" font-weight="600" fill="#1b5e20" font-style="italic">pCO₂ &lt; 35 mmHg</text>
+<text x="265" y="196" text-anchor="start" font-size="10.5" font-weight="600" fill="#1b5e20">HCO₃⁻ esperado:</text>
+<text x="265" y="211" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">aguda:   24 − 2,0 × ΔpCO₂/10</text>
+<text x="265" y="226" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">crônica: 24 − 4,0 × ΔpCO₂/10</text>
+<text x="265" y="241" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">(ΔpCO₂ = 40 − pCO₂)</text>
+<rect x="500" y="148" width="235" height="116" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="510" y="166" text-anchor="start" font-size="11.5" font-weight="700" fill="#bf360c">ACIDOSE METABÓLICA</text>
+<text x="510" y="181" text-anchor="start" font-size="10" font-weight="600" fill="#bf360c" font-style="italic">HCO₃⁻ &lt; 22 mEq/L</text>
+<text x="510" y="196" text-anchor="start" font-size="10.5" font-weight="600" fill="#bf360c">pCO₂ esperado (Winter):</text>
+<text x="510" y="211" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">1,5 × HCO₃⁻ + 8 ± 2</text>
+<text x="510" y="226" text-anchor="start" font-size="10.5" font-weight="400" fill="#333"></text>
+<text x="510" y="241" text-anchor="start" font-size="10.5" font-weight="600" fill="#bf360c">→ seguir para o PASSO 3</text>
+<rect x="745" y="148" width="235" height="116" rx="2" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="755" y="166" text-anchor="start" font-size="11.5" font-weight="700" fill="#0d47a1">ALCALOSE METABÓLICA</text>
+<text x="755" y="181" text-anchor="start" font-size="10" font-weight="600" fill="#0d47a1" font-style="italic">HCO₃⁻ &gt; 26 mEq/L</text>
+<text x="755" y="196" text-anchor="start" font-size="10.5" font-weight="600" fill="#0d47a1">pCO₂ esperado:</text>
+<text x="755" y="211" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">40 + 0,7 × (HCO₃⁻ − 24) ± 5</text>
+<rect x="10" y="272" width="970" height="32" rx="2" fill="#f7f7f7" stroke="#9e9e9e" stroke-width="1.5"/>
+<text x="20" y="290" text-anchor="start" font-size="10.5" font-weight="600" fill="#424242">Valor medido FORA da faixa esperada = há um segundo distúrbio. A compensação nunca normaliza o pH nem o ultracorrige.</text>
+<rect x="10" y="320" width="235" height="146" rx="2" fill="#ffebee" stroke="#c62828" stroke-width="1.5"/>
+<text x="20" y="338" text-anchor="start" font-size="11.5" font-weight="700" fill="#b71c1c">Causas</text>
+<text x="20" y="353" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">↓ drive: opioides, sedativos,</text>
+<text x="30" y="368" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">lesão de tronco</text>
+<text x="20" y="383" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Obstrução: DPOC, asma</text>
+<text x="20" y="398" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Neuromuscular: Guillain-Barré,</text>
+<text x="30" y="413" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">miastenia, TRM alto</text>
+<text x="20" y="428" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Parede torácica, fadiga</text>
+<text x="20" y="443" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">↑ produção de CO₂</text>
+<rect x="255" y="320" width="235" height="146" rx="2" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="265" y="338" text-anchor="start" font-size="11.5" font-weight="700" fill="#1b5e20">Causas</text>
+<text x="265" y="353" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">↑ drive: hipoxemia, dor,</text>
+<text x="275" y="368" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">ansiedade, febre</text>
+<text x="265" y="383" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Sepse, TEP</text>
+<text x="265" y="398" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Encefalopatia hepática</text>
+<text x="265" y="413" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Gravidez (progesterona)</text>
+<text x="265" y="428" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Salicilatos</text>
+<text x="265" y="443" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Ventilação mecânica excessiva</text>
+<rect x="500" y="320" width="235" height="146" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="510" y="338" text-anchor="start" font-size="11.5" font-weight="700" fill="#bf360c">Causas</text>
+<text x="510" y="353" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Dependem do ÂNION-GAP.</text>
+<text x="510" y="368" text-anchor="start" font-size="10.5" font-weight="400" fill="#333"></text>
+<text x="510" y="383" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Calcular o AG antes de</text>
+<text x="520" y="398" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">levantar hipóteses —</text>
+<text x="520" y="413" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">ver PASSO 3.</text>
+<rect x="745" y="320" width="235" height="146" rx="2" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="755" y="338" text-anchor="start" font-size="11.5" font-weight="700" fill="#0d47a1">Causas — pelo Cl⁻ urinário</text>
+<text x="755" y="353" text-anchor="start" font-size="10" font-weight="600" fill="#0d47a1" font-style="italic">Cl⁻u &lt; 20 (responde a salina):</text>
+<text x="755" y="368" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">vômito, SNG, diurético (após),</text>
+<text x="765" y="383" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">pós-hipercapnia</text>
+<text x="755" y="398" text-anchor="start" font-size="10" font-weight="600" fill="#0d47a1" font-style="italic">Cl⁻u &gt; 20 (resistente):</text>
+<text x="755" y="413" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">hiperaldosteronismo, Cushing,</text>
+<text x="765" y="428" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Bartter/Gitelman, hipocalemia</text>
+<text x="765" y="443" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">grave, diurético em uso</text>
+<rect x="10" y="482" width="970" height="24" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="20" y="498" text-anchor="start" font-size="11.5" font-weight="700" fill="#1a237e">PASSO 3</text>
+<text x="82" y="498" text-anchor="start" font-size="11.5" font-weight="600" fill="#1a237e">— ânion-gap (só na acidose metabólica)</text>
+<rect x="10" y="518" width="970" height="68" rx="2" fill="#f7f7f7" stroke="#9e9e9e" stroke-width="1.5"/>
+<text x="20" y="536" text-anchor="start" font-size="10.5" font-weight="600" fill="#424242">AG = Na⁺ − (Cl⁻ + HCO₃⁻)   |   normal ≈ 12 mEq/L   |   AG alto = ânion não medido</text>
+<text x="20" y="551" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">AG corrigido = AG + 2,5 × (4 − albumina em g/dL)   — SEMPRE corrigir: albumina 2,0 mascara um gap de 5 mEq/L</text>
+<text x="20" y="566" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">AG negativo ou muito baixo: cátion não medido (Ca, Mg, Li), intoxicação por brometo/iodo, mieloma múltiplo</text>
+<rect x="10" y="598" width="480" height="176" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="20" y="616" text-anchor="start" font-size="11.5" font-weight="700" fill="#bf360c">COM ÂNION-GAP (AG &gt; 12)   —   "GOLDMARK"</text>
+<text x="20" y="631" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">G — Glicóis (etilenoglicol, propilenoglicol)</text>
+<text x="20" y="646" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">O — Oxoprolina (piroglutâmico: paracetamol crônico)</text>
+<text x="20" y="661" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">L — L-lactato (choque, isquemia, metformina)</text>
+<text x="20" y="676" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">D — D-lactato (síndrome do intestino curto)</text>
+<text x="20" y="691" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">M — Metanol</text>
+<text x="20" y="706" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">A — Aspirina (salicilato)</text>
+<text x="20" y="721" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">R — Renal (uremia)</text>
+<text x="20" y="736" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">K — Cetoacidose (diabética, alcoólica, jejum)</text>
+<text x="20" y="751" text-anchor="start" font-size="10" font-weight="600" fill="#bf360c" font-style="italic">Lactato normal com AG alto → gap não-lático</text>
+<rect x="510" y="598" width="470" height="176" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="520" y="616" text-anchor="start" font-size="11.5" font-weight="700" fill="#bf360c">SEM ÂNION-GAP (AG ≤ 12)   —   hiperclorêmica</text>
+<text x="520" y="631" text-anchor="start" font-size="10" font-weight="600" fill="#bf360c" font-style="italic">Perda gastrointestinal de HCO₃⁻:</text>
+<text x="530" y="646" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">diarreia, fístula, ureterossigmoidostomia</text>
+<text x="520" y="661" text-anchor="start" font-size="10" font-weight="600" fill="#bf360c" font-style="italic">Perda renal de HCO₃⁻ / retenção de H⁺:</text>
+<text x="530" y="676" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">ATR tipo 1, 2 e 4, acetazolamida,</text>
+<text x="530" y="691" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">hipoaldosteronismo, IRA/DRC inicial</text>
+<text x="520" y="706" text-anchor="start" font-size="10" font-weight="600" fill="#bf360c" font-style="italic">Ganho de cloreto:</text>
+<text x="530" y="721" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">SF 0,9% em grande volume, nutrição parenteral</text>
+<text x="520" y="736" text-anchor="start" font-size="10.5" font-weight="400" fill="#333"></text>
+<text x="520" y="751" text-anchor="start" font-size="10" font-weight="600" fill="#bf360c" font-style="italic">Ânion-gap urinário (Na+K−Cl) separa renal de GI</text>
+<rect x="10" y="790" width="970" height="24" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="20" y="806" text-anchor="start" font-size="11.5" font-weight="700" fill="#1a237e">PASSO 4</text>
+<text x="82" y="806" text-anchor="start" font-size="11.5" font-weight="600" fill="#1a237e">— delta-delta: há um segundo distúrbio metabólico?</text>
+<rect x="10" y="826" width="970" height="50" rx="2" fill="#f7f7f7" stroke="#9e9e9e" stroke-width="1.5"/>
+<text x="20" y="844" text-anchor="start" font-size="10.5" font-weight="600" fill="#424242">ΔAG / ΔHCO₃⁻   |   ΔAG = AG corrigido − 12   |   ΔHCO₃⁻ = 24 − HCO₃⁻</text>
+<text x="20" y="859" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">Aplicar somente quando houver ânion-gap elevado.</text>
+<rect x="10" y="886" width="316" height="64" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="20" y="904" text-anchor="start" font-size="11.5" font-weight="700" fill="#bf360c">&lt; 1,0</text>
+<text x="20" y="919" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">AGMA + acidose sem AG</text>
+<text x="30" y="934" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">(hiperclorêmica) associada</text>
+<rect x="337" y="886" width="316" height="64" rx="2" fill="#f7f7f7" stroke="#9e9e9e" stroke-width="1.5"/>
+<text x="347" y="904" text-anchor="start" font-size="11.5" font-weight="700" fill="#424242">1,0 – 1,6</text>
+<text x="347" y="919" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">AGMA pura</text>
+<text x="357" y="934" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">sem outro distúrbio metabólico</text>
+<rect x="664" y="886" width="316" height="64" rx="2" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="674" y="904" text-anchor="start" font-size="11.5" font-weight="700" fill="#0d47a1">&gt; 1,6</text>
+<text x="674" y="919" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">AGMA + alcalose metabólica</text>
+<text x="684" y="934" text-anchor="start" font-size="10.5" font-weight="400" fill="#333">associada (ou HCO₃⁻ prévio alto)</text>
+</svg>
+            </div>
+            <p class="algo-nota"><strong>Ordem importa:</strong> identificar o primário antes de julgar a
+            compensação, e calcular o ânion-gap antes de levantar hipóteses de acidose metabólica. Os
+            limiares deste diagrama são os mesmos que a calculadora abaixo aplica — inclusive a correção do
+            ânion-gap pela albumina, que muda a conduta em quem tem albumina 2,0 g/dL e AG aparentemente
+            normal. O delta-delta só faz sentido quando há ânion-gap elevado; aplicá-lo a uma acidose
+            hiperclorêmica pura produz resultado sem significado.</p>
+        </div>
+    </details>
+</div>
+
 <!-- SEÇÃO 4: GASOMETRIA -->
 <div class="section">
     <h3>Gasometria — Interpretação Ácido-Base</h3>
@@ -1246,16 +1391,18 @@ function classifyAcidBase(inp) {
         const dHCO3 = HCO3_REF - hco3;
         const hco3c = hco3 + dAG;
         if (dHCO3 <= 0) {
-            delta = { dAG: fmt1(dAG), dHCO3: '≤0', ratio: '≫2',
+            delta = { dAG: fmt1(dAG), dHCO3: '≤0', ratio: '≫1,6',
                       label: 'AGMA + alcalose metabólica associada (HCO3 ≥ 24)',
                       hco3c: fmt1(hco3c), hco3c_note: '' };
         } else {
-            const r = dAG / dHCO3;
+            // arredonda antes de classificar: o rótulo tem que bater com a razão exibida,
+            // senão ruído de ponto flutuante põe 1,60 na faixa "> 1,6"
+            const r = Math.round((dAG / dHCO3) * 100) / 100;
             let label;
             // C2 fix: faixas contíguas sem lacuna
             if      (r < 0.4)  label = 'NAGMA predominante (acidose hiperclorêmica)';
             else if (r < 1.0)  label = 'mista: AGMA + acidose sem AG (hiperclorêmica)';
-            else if (r <= 2.0) label = 'AGMA pura';
+            else if (r <= 1.6) label = 'AGMA pura';
             else               label = 'AGMA + alcalose metabólica associada (ou HCO3 prévio elevado)';
             const hco3c_note = hco3c > 26 ? ' → alcalose metabólica associada' :
                                hco3c < 22 ? ' → acidose sem AG associada' : '';
