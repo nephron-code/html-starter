@@ -416,6 +416,7 @@
                 <option>Noradrenalina (4 amp + 234mL SG 5%)</option>
                 <option>Noradrenalina 2x (8 amp + 218mL SG 5%)</option>
                 <option>Dobutamina (4 amp + 170mL SG 5%)</option>
+                <option>Milrinona (20mg + 80mL SG 5%)</option>
                 <option>Nitroglicerina (1 amp + 240mL SG 5%)</option>
                 <option>Nitroprussiato (1 amp + 248mL SG 5%)</option>
                 <option>Vasopressina (1 amp + 100mL SF 0,9%)</option>
@@ -926,6 +927,8 @@ const DVA_DRUGS = [
     { factor: 64,            unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.05, maxDose: 2    },
     { factor: 128,           unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.05, maxDose: 2    },
     { factor: 4000,          unit: 'mcg/kg/min', needsWeight: true,  minDose: 2.5,  maxDose: 20   },
+    { factor: 200,           unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.375, maxDose: 0.75,
+      note: 'Eliminação renal: meia-vida ~2,5 h, prolongada 3–5× na disfunção renal. Reduzir dose e vigiar hipotensão e arritmia.' },
     { factor: 200 / 60,      unit: 'mcg/min',    needsWeight: false, minDose: 5,    maxDose: 200  },
     { factor: 200,           unit: 'mcg/kg/min', needsWeight: true,  minDose: 0.5,  maxDose: 10   },
     { factor: 20 / 101 / 60, unit: 'UI/min',     needsWeight: false, minDose: 0.01, maxDose: 0.04 },
@@ -954,6 +957,7 @@ function calcDVA() {
     } else if (dose > drug.maxDose) {
         texto += '\n⚠️ ATENÇÃO: dose acima da faixa usual!';
     }
+    if (drug.note) texto += '\n' + drug.note;
     out.textContent = texto;
 }
 
