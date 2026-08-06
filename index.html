@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interno++</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -69,6 +69,50 @@
         }
         .disclaimer strong { color: #333; }
         .privacy-note { font-size: 11px; color: #aaa; margin: 4px 0 0; }
+
+        /* ── ABAS ────────────────────────────────────────────── */
+        .tabs-wrap {
+            position: sticky; top: 0; z-index: 10;
+            background: #f5f5f5; border-bottom: 1px solid #d0d0d0;
+            margin-top: 16px;
+        }
+        .tabs {
+            max-width: 900px; margin: 0 auto; padding: 0 20px;
+            display: flex; gap: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            background: none; border: none;
+            border-bottom: 2px solid transparent;
+            color: #777; padding: 11px 16px;
+            font-size: 13px; font-weight: 600; font-family: inherit;
+            letter-spacing: 0.02em; white-space: nowrap;
+            cursor: pointer; margin-bottom: -1px;
+        }
+        .tab-btn:hover { background: none; color: #1a237e; }
+        .tab-btn[aria-selected="true"] { color: #1a237e; border-bottom-color: #1a237e; }
+        .tab-panel { display: none; padding-top: 24px; }
+        .tab-panel.active { display: block; }
+
+        /* ── FLUXOGRAMA / ALGORITMO ──────────────────────────── */
+        details.algo { border: 1px solid #d0d0d0; background: #fff; }
+        details.algo > summary {
+            cursor: pointer; padding: 10px 12px; list-style: none;
+            font-size: 0.9rem; font-weight: 600; color: #1a237e;
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        details.algo > summary::-webkit-details-marker { display: none; }
+        details.algo > summary::before { content: '\25B8  '; }
+        details.algo[open] > summary::before { content: '\25BE  '; }
+        details.algo > summary:hover { background: #f0f0f0; }
+        .algo-body { padding: 0 12px 12px; }
+        .fluxo-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .fluxo-wrap svg { display: block; min-width: 1000px; width: 100%; height: auto; }
+        .algo-nota { font-size: 12px; color: #666; line-height: 1.6; margin: 12px 0 0;
+                     border-left: 3px solid #d0d0d0; padding-left: 10px; }
+        .algo-nota strong { color: #333; }
     </style>
 </head>
 <body>
@@ -83,6 +127,19 @@
     <strong>⚠️ Ferramenta de uso educativo.</strong> As informações apresentadas têm caráter auxiliar e devem ser verificadas em fontes primárias antes de qualquer aplicação clínica. <strong>Esta ferramenta não substitui o julgamento médico.</strong> Doses, diluições e intervalos de referência podem variar conforme protocolo institucional, características do paciente e atualização da literatura.
 </div>
 
+<!-- ═══ NAVEGAÇÃO POR ABAS ═══ -->
+<div class="tabs-wrap">
+    <nav class="tabs" role="tablist">
+        <button class="tab-btn" role="tab" data-aba="transcricao" aria-selected="true"  aria-controls="aba-transcricao" onclick="trocarAba('transcricao')">Transcrição</button>
+        <button class="tab-btn" role="tab" data-aba="gasometria"  aria-selected="false" aria-controls="aba-gasometria"  onclick="trocarAba('gasometria')">Gasometria</button>
+        <button class="tab-btn" role="tab" data-aba="disnatremia" aria-selected="false" aria-controls="aba-disnatremia" onclick="trocarAba('disnatremia')">Disnatremias</button>
+        <button class="tab-btn" role="tab" data-aba="dva"         aria-selected="false" aria-controls="aba-dva"         onclick="trocarAba('dva')">DVA / Sedação</button>
+    </nav>
+</div>
+
+<!-- ═══ ABA: TRANSCRIÇÃO ═══ -->
+<div class="tab-panel active" id="aba-transcricao" role="tabpanel">
+
 <!-- SEÇÃO 1: LABORATÓRIO -->
 <div class="section">
     <h3>Exames Laboratoriais</h3>
@@ -91,8 +148,8 @@
     <textarea id="textoLab" placeholder="Cole o laudo aqui..."></textarea>
     <div class="actions">
         <button onclick="extrairLab()">Extrair</button>
-        <button class="secondary" onclick="copiarResultado('resultadoLab')">Copiar resultado</button>
-        <button class="secondary" onclick="limparSecao('textoLab', 'resultadoLab')">Limpar</button>
+        <button class="secondary" onclick="copiarResultado(&#39;resultadoLab&#39;)">Copiar resultado</button>
+        <button class="secondary" onclick="limparSecao(&#39;textoLab&#39;, &#39;resultadoLab&#39;)">Limpar</button>
     </div>
     <div class="resultado" id="resultadoLab">Nenhum dado extraído ainda.</div>
 </div>
@@ -105,8 +162,8 @@
     <textarea id="textoControles" placeholder="Cole a monitorização aqui..."></textarea>
     <div class="actions">
         <button onclick="extrairControles()">Extrair</button>
-        <button class="secondary" onclick="copiarResultado('resultadoControles')">Copiar resultado</button>
-        <button class="secondary" onclick="limparSecao('textoControles', 'resultadoControles')">Limpar</button>
+        <button class="secondary" onclick="copiarResultado(&#39;resultadoControles&#39;)">Copiar resultado</button>
+        <button class="secondary" onclick="limparSecao(&#39;textoControles&#39;, &#39;resultadoControles&#39;)">Limpar</button>
     </div>
     <div class="resultado" id="resultadoControles">Nenhum dado extraído ainda.</div>
 </div>
@@ -119,11 +176,16 @@
     <textarea id="textoBH" placeholder="Cole o balanço hídrico aqui..."></textarea>
     <div class="actions">
         <button onclick="extrairBH()">Extrair</button>
-        <button class="secondary" onclick="copiarResultado('resultadoBH')">Copiar resultado</button>
-        <button class="secondary" onclick="limparSecao('textoBH', 'resultadoBH')">Limpar</button>
+        <button class="secondary" onclick="copiarResultado(&#39;resultadoBH&#39;)">Copiar resultado</button>
+        <button class="secondary" onclick="limparSecao(&#39;textoBH&#39;, &#39;resultadoBH&#39;)">Limpar</button>
     </div>
     <div class="resultado" id="resultadoBH">Nenhum dado extraído ainda.</div>
 </div>
+
+</div><!-- /aba-transcricao -->
+
+<!-- ═══ ABA: GASOMETRIA ═══ -->
+<div class="tab-panel" id="aba-gasometria" role="tabpanel">
 
 <!-- SEÇÃO 4: GASOMETRIA -->
 <div class="section">
@@ -164,11 +226,184 @@
         </div>
     </div>
     <div class="actions">
-        <button class="secondary" onclick="copiarResultado('resultadoGaso')">Copiar resultado</button>
+        <button class="secondary" onclick="copiarResultado(&#39;resultadoGaso&#39;)">Copiar resultado</button>
         <button class="secondary" onclick="limparGaso()">Limpar</button>
     </div>
     <div class="resultado" id="resultadoGaso">Informe pH, pCO2 e HCO3⁻ para interpretar.</div>
 </div>
+
+</div><!-- /aba-gasometria -->
+
+<!-- ═══ ABA: DISNATREMIAS ═══ -->
+<div class="tab-panel" id="aba-disnatremia" role="tabpanel">
+
+<!-- SEÇÃO 7: ALGORITMO DIAGNÓSTICO -->
+<div class="section">
+    <details class="algo">
+        <summary>Hiponatremia — abordagem diagnóstica</summary>
+        <div class="algo-body">
+            <div class="fluxo-wrap">
+<svg viewBox="0 0 1160 645" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img" aria-label="Algoritmo diagnóstico da hiponatremia">
+<defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#707070"/></marker></defs>
+<rect x="475" y="8" width="210" height="32" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="580" y="29" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1a237e">HIPONATREMIA</text>
+<line x1="580" y1="40" x2="580" y2="62" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="455" y="62" width="250" height="32" rx="2" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+<text x="580" y="83" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1a237e">Osmolalidade sérica</text>
+<line x1="580" y1="94" x2="580" y2="112" stroke="#707070" stroke-width="1.4"/>
+<line x1="190" y1="112" x2="970" y2="112" stroke="#707070" stroke-width="1.4"/>
+<line x1="190" y1="112" x2="190" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="580" y1="112" x2="580" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="970" y1="112" x2="970" y2="134" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="190" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Normal</text>
+<text x="190" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(280–295 mOsm/kg)</text>
+<line x1="190" y1="178" x2="190" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="580" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Baixa</text>
+<text x="580" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(&lt; 280 mOsm/kg)</text>
+<line x1="580" y1="178" x2="580" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="970" y="152" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Alta</text>
+<text x="970" y="169" text-anchor="middle" font-size="11.5" font-weight="400" fill="#666">(&gt; 295 mOsm/kg)</text>
+<line x1="970" y1="178" x2="970" y2="200" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="20" y="200" width="340" height="112" rx="2" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+<text x="32" y="222" text-anchor="start" font-size="12.5" font-weight="600" fill="#4527a0">Hiponatremia isotônica</text>
+<text x="32" y="239" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#4527a0">(pseudo-hiponatremia)</text>
+<text x="32" y="256" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Hiperproteinemia</text>
+<text x="32" y="273" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hiperlipidemia (quilomícrons,</text>
+<text x="46" y="290" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">triglicérides, raramente colesterol)</text>
+<rect x="480" y="200" width="200" height="62" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="580" y="224" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">Hiponatremia</text>
+<text x="580" y="244" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">hipotônica</text>
+<rect x="800" y="200" width="340" height="112" rx="2" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="812" y="222" text-anchor="start" font-size="12.5" font-weight="600" fill="#1b5e20">Hiponatremia hipertônica</text>
+<text x="812" y="239" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#1b5e20">(translocacional)</text>
+<text x="812" y="256" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Hiperglicemia</text>
+<text x="812" y="273" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Manitol, sorbitol, glicerol, maltose</text>
+<text x="812" y="290" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Contrastes radiológicos</text>
+<line x1="580" y1="262" x2="580" y2="292" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="470" y="292" width="220" height="32" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="580" y="313" text-anchor="middle" font-size="12.5" font-weight="600" fill="#bf360c">Estado volêmico</text>
+<line x1="580" y1="324" x2="580" y2="348" stroke="#707070" stroke-width="1.4"/>
+<line x1="250" y1="348" x2="1030" y2="348" stroke="#707070" stroke-width="1.4"/>
+<line x1="250" y1="348" x2="250" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="720" y1="348" x2="720" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="1030" y1="348" x2="1030" y2="370" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<text x="250" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Hipovolêmica</text>
+<text x="720" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Euvolêmica</text>
+<text x="1030" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Hipervolêmica</text>
+<line x1="250" y1="396" x2="135" y2="438" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="250" y1="396" x2="390" y2="438" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="720" y1="396" x2="720" y2="440" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<line x1="1030" y1="396" x2="1030" y2="440" stroke="#707070" stroke-width="1.4" marker-end="url(#seta)"/>
+<rect x="20" y="442" width="230" height="112" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="32" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Na⁺ urinário &lt; 10 mEq/L</text>
+<text x="32" y="481" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#bf360c">Perda extrarrenal de sal</text>
+<text x="32" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Desidratação</text>
+<text x="32" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Diarreia</text>
+<text x="32" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Vômitos</text>
+<rect x="265" y="442" width="250" height="180" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="277" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Na⁺ urinário &gt; 20 mEq/L</text>
+<text x="277" y="481" text-anchor="start" font-size="11.5" font-weight="400" font-style="italic" fill="#bf360c">Perda renal de sal</text>
+<text x="277" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Diuréticos</text>
+<text x="277" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. IECA</text>
+<text x="277" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Nefropatias</text>
+<text x="277" y="549" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Deficiência de</text>
+<text x="291" y="566" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">mineralocorticoide</text>
+<text x="277" y="583" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">5. Síndrome cerebral</text>
+<text x="291" y="600" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">perdedora de sal</text>
+<rect x="545" y="442" width="350" height="180" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="557" y="464" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. SIADH</text>
+<text x="557" y="481" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hiponatremia pós-operatória</text>
+<text x="557" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Hipotireoidismo</text>
+<text x="557" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Polidipsia psicogênica</text>
+<text x="557" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">5. Potomania por cerveja</text>
+<text x="557" y="549" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">6. Reação idiossincrásica a drogas</text>
+<text x="571" y="566" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">(tiazídicos, IECA)</text>
+<text x="557" y="583" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">7. Exercício de endurance</text>
+<text x="557" y="600" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">8. Deficiência de ACTH</text>
+<rect x="915" y="442" width="225" height="112" rx="2" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
+<text x="927" y="464" text-anchor="start" font-size="12.5" font-weight="600" fill="#bf360c">Estados edematosos</text>
+<text x="927" y="481" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">1. Insuficiência cardíaca</text>
+<text x="927" y="498" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">2. Hepatopatia</text>
+<text x="927" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">3. Síndrome nefrótica (rara)</text>
+<text x="927" y="532" text-anchor="start" font-size="11.5" font-weight="400" fill="#333">4. Doença renal avançada</text>
+</svg>
+            </div>
+            <p class="algo-nota"><strong>Além do fluxograma:</strong> a osmolalidade urinária separa o que o
+            estado volêmico não separa. Osm<sub>u</sub> &lt; 100 mOsm/kg indica excesso de ingesta de água livre
+            (polidipsia primária, potomania por cerveja, dieta pobre em soluto) — o rim está diluindo
+            normalmente. Osm<sub>u</sub> ≥ 100 mOsm/kg com euvolemia e Na⁺ urinário &gt; 30 mEq/L aponta para SIADH,
+            mas o diagnóstico é de exclusão: afastar hipotireoidismo e insuficiência adrenal antes de firmar.
+            Ácido úrico &lt; 4 mg/dL e fração de excreção de ureia &lt; 55% reforçam SIADH e ajudam a distingui-lo
+            da hipovolemia quando o exame físico é ambíguo. Atenção ao uso recente de diurético: tiazídico
+            produz hiponatremia que imita SIADH.</p>
+        </div>
+    </details>
+</div>
+
+<!-- SEÇÃO 7: ACT E DÉFICITS -->
+<div class="section">
+    <h3>Disnatremias — ACT e Déficits</h3>
+    <p class="hint">Informe peso e Na⁺ sérico. Os mesmos dados alimentam a fórmula de Adrogué-Madias abaixo.</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>Sexo / faixa etária (fator de ACT)</label>
+            <select id="naSexo" onchange="calcNa()">
+                <option value="homem">Homem adulto (0,6)</option>
+                <option value="mulher">Mulher adulta (0,5)</option>
+                <option value="homem_idoso">Homem idoso &gt;65a (0,5)</option>
+                <option value="mulher_idosa">Mulher idosa &gt;65a (0,45)</option>
+                <option value="crianca">Criança (0,6)</option>
+            </select>
+        </div>
+        <div class="calc-row">
+            <label>Peso (kg)</label>
+            <input type="number" id="naPeso" min="2" max="300" step="0.5" placeholder="ex: 70" oninput="calcNa()">
+        </div>
+        <div class="calc-row">
+            <label>Na⁺ sérico atual (mEq/L)</label>
+            <input type="number" id="naAtual" min="90" max="200" step="0.1" placeholder="ex: 118" oninput="calcNa()">
+        </div>
+        <div class="calc-row">
+            <label>Na⁺ alvo (mEq/L)</label>
+            <input type="number" id="naAlvo" min="100" max="160" step="0.1" value="140" oninput="calcNa()">
+        </div>
+        <div class="calc-row">
+            <label>Glicemia (mg/dL) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="naGlicemia" min="20" max="1500" step="1" placeholder="para Na⁺ corrigido" oninput="calcNa()">
+        </div>
+    </div>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoNa')">Copiar resultado</button>
+        <button class="secondary" onclick="limparNa()">Limpar</button>
+    </div>
+    <div class="resultado" id="resultadoNa">Informe peso e Na⁺ sérico atual.</div>
+</div>
+
+<!-- SEÇÃO 8: ADROGUÉ-MADIAS -->
+<div class="section">
+    <h3>Adrogué-Madias</h3>
+    <p class="hint">Usa peso, fator de ACT e Na⁺ informados acima. Escolha a solução e o ΔNa⁺ desejado em 24 h.</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>Solução para o plano de infusão</label>
+            <select id="amSolucao" onchange="calcNa()"></select>
+        </div>
+        <div class="calc-row">
+            <label>ΔNa⁺ desejado em 24 h (mEq/L)</label>
+            <input type="number" id="amDelta" min="-15" max="15" step="0.5" value="6" oninput="calcNa()">
+            <p class="privacy-note">Positivo para elevar (hiponatremia); negativo para reduzir (hipernatremia).</p>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoAM')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoAM">Informe peso e Na⁺ sérico atual.</div>
+</div>
+
+</div><!-- /aba-disnatremia -->
+
+<!-- ═══ ABA: DVA / SEDAÇÃO ═══ -->
+<div class="tab-panel" id="aba-dva" role="tabpanel">
 
 <!-- SEÇÃO 5: CALCULADORA DVA -->
 <div class="section">
@@ -210,10 +445,12 @@
         </div>
     </div>
     <div class="actions">
-        <button class="secondary" onclick="copiarResultado('resultadoISR')">Copiar resultado</button>
+        <button class="secondary" onclick="copiarResultado(&#39;resultadoISR&#39;)">Copiar resultado</button>
     </div>
     <div class="resultado" id="resultadoISR">Informe o peso para calcular.</div>
 </div>
+
+</div><!-- /aba-dva -->
 
 <footer>
   <p>Sugestões, críticas ou elogios? <a href="https://forms.gle/Fpc2iQtnK5wUr2pX8" target="_blank" rel="noopener">Preencha o formulário →</a></p>
@@ -1061,11 +1298,245 @@ function interpretarGaso() {
     const r = classifyAcidBase(inp);
     setResult('resultadoGaso', formatGasoInterpretation(r, inp));
 }
+
+// ── SEÇÃO 6: DISNATREMIAS ────────────────────────────────────
+
+const ACT_FATOR = {
+    homem:        0.60,
+    mulher:       0.50,
+    homem_idoso:  0.50,
+    mulher_idosa: 0.45,
+    crianca:      0.60
+};
+
+// Na⁺ + K⁺ de cada solução (mEq/L)
+// NaCl 20% = 3,42 mEq de Na⁺ por mL (amp 10 mL = 34 mEq)
+// SF 0,9%  = 0,154 mEq de Na⁺ por mL
+const SOLUCOES = [
+    { name: 'NaCl 3% (hipertônica)', na: 513, k: 0,
+      prep: '445 mL de SF 0,9% + 55 mL de NaCl 20% (5,5 amp de 10 mL) = 500 mL → 3,00%',
+      alerta: 'Hipertônica: preferir acesso central para infusão contínua. Em periférico, usar veia calibrosa e vigiar o sítio.' },
+    { name: 'NaCl 2,8% (5 ampolas)', na: 481, k: 0,
+      prep: '450 mL de SF 0,9% + 50 mL de NaCl 20% (5 amp de 10 mL) = 500 mL → 2,81%',
+      alerta: 'Preparo com 5 ampolas fechadas — mais prático à beira do leito, ~6% menos concentrado que a 3%. Mesmos cuidados de acesso.' },
+    { name: 'NaCl 0,9% (SF)',             na: 154, k: 0  },
+    { name: 'NaCl 0,9% + 20 mEq KCl/L',   na: 154, k: 20 },
+    { name: 'Ringer lactato',             na: 130, k: 4  },
+    { name: 'NaCl 0,45%',                 na: 77,  k: 0  },
+    { name: 'NaCl 0,45% + 20 mEq KCl/L',  na: 77,  k: 20 },
+    { name: 'SG 5% (água livre)',         na: 0,   k: 0  }
+];
+
+function limparNa() {
+    ['naPeso','naAtual','naGlicemia'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('naAlvo').value  = '140';
+    document.getElementById('amDelta').value = '6';
+    document.getElementById('naSexo').selectedIndex   = 0;
+    document.getElementById('amSolucao').selectedIndex = 0;
+    setResult('resultadoNa', 'Informe peso e Na⁺ sérico atual.');
+    setResult('resultadoAM', 'Informe peso e Na⁺ sérico atual.');
+}
+
+function classificarNa(na) {
+    if (na < 125) return 'hiponatremia grave';
+    if (na < 130) return 'hiponatremia moderada';
+    if (na < 135) return 'hiponatremia leve';
+    if (na <= 145) return 'natremia normal';
+    if (na < 151) return 'hipernatremia leve';
+    if (na < 160) return 'hipernatremia moderada';
+    return 'hipernatremia grave';
+}
+
+function calcNa() {
+    const el = id => document.getElementById(id);
+    const n1 = n => n.toFixed(1).replace('.', ',');
+    const n2 = n => n.toFixed(2).replace('.', ',');
+    const n0 = n => Math.round(n).toString();
+
+    const fator   = ACT_FATOR[el('naSexo').value] || 0.6;
+    const peso    = toFloat(el('naPeso').value);
+    const naAtual = toFloat(el('naAtual').value);
+    const gli     = toFloat(el('naGlicemia').value);
+    let   naAlvo  = toFloat(el('naAlvo').value);
+    if (isNaN(naAlvo) || naAlvo <= 0) naAlvo = 140;
+
+    if (isNaN(peso) || peso <= 0 || isNaN(naAtual)) {
+        setResult('resultadoNa', 'Informe peso e Na⁺ sérico atual.');
+        setResult('resultadoAM', 'Informe peso e Na⁺ sérico atual.');
+        return;
+    }
+
+    const act = fator * peso;
+    const L = [];
+
+    L.push('Na⁺ ' + n1(naAtual) + ' mEq/L → ' + classificarNa(naAtual).toUpperCase());
+    L.push('ACT = ' + n2(fator) + ' × ' + n1(peso) + ' kg = ' + n1(act) + ' L');
+
+    if (!isNaN(gli) && gli > 100) {
+        const katz = naAtual + 1.6 * (gli - 100) / 100;
+        const hill = naAtual + 2.4 * (gli - 100) / 100;
+        L.push('');
+        L.push('Na⁺ CORRIGIDO PARA GLICEMIA ' + n0(gli) + ' mg/dL');
+        L.push('  Katz (1,6):    ' + n1(katz) + ' mEq/L');
+        L.push('  Hillier (2,4): ' + n1(hill) + ' mEq/L');
+        L.push('  → serve para julgar a tonicidade real. Se o Na⁺ corrigido for normal, a hiponatremia');
+        L.push('    é translocacional: tratar a hiperglicemia, não repor sódio. Os cálculos abaixo usam');
+        L.push('    o Na⁺ medido (' + n1(naAtual) + '), que é o valor que a fórmula pressupõe.');
+    }
+
+    L.push('');
+
+    if (naAtual < naAlvo) {
+        const defNa = act * (naAlvo - naAtual);
+        L.push('DÉFICIT DE SÓDIO');
+        L.push('  Déficit = ACT × (Na⁺ alvo − Na⁺ atual)');
+        L.push('  = ' + n1(act) + ' L × (' + n1(naAlvo) + ' − ' + n1(naAtual) + ') = ' + n0(defNa) + ' mEq');
+        L.push('');
+        L.push('  Volume equivalente (só o déficit, sem perdas nem manutenção):');
+        L.push('    • NaCl 3% (513 mEq/L):   ' + n0(defNa / 513 * 1000) + ' mL');
+        L.push('    • NaCl 2,8% (481 mEq/L): ' + n0(defNa / 481 * 1000) + ' mL');
+        L.push('    • NaCl 0,9% (154 mEq/L): ' + n0(defNa / 154 * 1000) + ' mL');
+        L.push('');
+        L.push('  PREPARO DA SALINA HIPERTÔNICA (NaCl 20% = 3,42 mEq/mL; amp 10 mL = 34 mEq)');
+        L.push('    NaCl 3,00%: 445 mL de SF 0,9% + 55 mL de NaCl 20% (5,5 amp) = 500 mL');
+        L.push('    NaCl 2,81%: 450 mL de SF 0,9% + 50 mL de NaCl 20% (5 amp)   = 500 mL');
+        L.push('');
+        L.push('  ⚠ Este é o déficit TOTAL até o alvo — NÃO é a meta de 24 h.');
+        L.push('');
+        L.push('LIMITES DE CORREÇÃO — HIPONATREMIA');
+        L.push('  Meta:   +4 a +6 mEq/L nas primeiras 24 h');
+        L.push('  Limite: ≤ 8 mEq/L em 24 h e ≤ 18 mEq/L em 48 h (risco de desmielinização osmótica)');
+        L.push('  Alto risco de SDO: Na⁺ < 120, alcoolismo, desnutrição, hepatopatia, hipocalemia, tiazídico');
+        L.push('  → nesses casos, ficar no limite inferior (+4 a +6 mEq/L/24 h)');
+        L.push('  Sintomática grave (convulsão, rebaixamento, coma):');
+        L.push('    NaCl 3% 100–150 mL IV em 10 min, repetir até 3× até melhora, alvo +4 a +6 mEq/L');
+        L.push('  Dosar Na⁺ a cada 4–6 h (a cada 2 h se hipertônica em curso)');
+        L.push('  Correção excessiva → reverter com SG 5% ± desmopressina');
+    } else if (naAtual > naAlvo) {
+        const dal = act * (naAtual / naAlvo - 1);
+        L.push('DÉFICIT DE ÁGUA LIVRE');
+        L.push('  DAL = ACT × (Na⁺ atual ÷ Na⁺ alvo − 1)');
+        L.push('  = ' + n1(act) + ' L × (' + n1(naAtual) + ' ÷ ' + n1(naAlvo) + ' − 1) = ' + n2(dal) + ' L (' + n0(dal * 1000) + ' mL)');
+        L.push('');
+        L.push('  ⚠ Só o déficit já instalado. Somar perdas em curso (diurese, drenos, TGI, febre)');
+        L.push('    e insensíveis (~30–40 mL/h no adulto) ao volume total do dia.');
+        L.push('');
+        L.push('LIMITES DE CORREÇÃO — HIPERNATREMIA');
+        L.push('  Crônica (>48 h ou duração desconhecida): ≤ 10 mEq/L em 24 h (~0,5 mEq/L/h)');
+        L.push('  Aguda documentada (<48 h): até 1 mEq/L/h');
+        L.push('  → repor o déficit em 48–72 h; correção rápida em crônica causa edema cerebral');
+        L.push('  Preferir via enteral (água livre por SNE) quando possível');
+        L.push('  Dosar Na⁺ a cada 4–6 h');
+    } else {
+        L.push('Na⁺ atual igual ao alvo — sem déficit a calcular.');
+    }
+
+    setResult('resultadoNa', L.join('\n'));
+
+    // ── Adrogué-Madias ──
+    const A = [];
+    const denom = act + 1;
+    const idx   = parseInt(el('amSolucao').value, 10);
+    const sol   = SOLUCOES[isNaN(idx) ? 0 : idx];
+    let   alvoD = toFloat(el('amDelta').value);
+
+    A.push('ΔNa⁺ por litro infundido = (Na⁺inf + K⁺inf − Na⁺sérico) ÷ (ACT + 1)');
+    A.push('ACT + 1 = ' + n1(denom));
+    A.push('');
+    A.push('EFEITO DE 1 LITRO DE CADA SOLUÇÃO');
+    for (const s of SOLUCOES) {
+        const d = (s.na + s.k - naAtual) / denom;
+        const sinal = d >= 0 ? '+' : '−';
+        A.push('  • ' + s.name + ' (' + (s.na + s.k) + ' mEq/L) → ' + sinal + n2(Math.abs(d)) + ' mEq/L');
+        if (s.prep) A.push('      preparo: ' + s.prep);
+    }
+
+    const dSel = (sol.na + sol.k - naAtual) / denom;
+    A.push('');
+    A.push('PLANO — ' + sol.name);
+
+    if (isNaN(alvoD) || alvoD === 0) {
+        A.push('  Informe o ΔNa⁺ desejado em 24 h.');
+    } else if (Math.abs(dSel) < 0.01) {
+        A.push('  Esta solução é praticamente isonatrêmica em relação ao paciente (ΔNa⁺ ≈ 0):');
+        A.push('  não altera o Na⁺ sérico de forma útil. Escolha outra solução.');
+    } else if (Math.sign(dSel) !== Math.sign(alvoD)) {
+        A.push('  ⚠ Esta solução move o Na⁺ na direção OPOSTA à meta (' +
+               (dSel > 0 ? 'eleva' : 'reduz') + ' o Na⁺, meta é ' + (alvoD > 0 ? 'elevar' : 'reduzir') + ').');
+        A.push('  Selecione uma solução compatível.');
+    } else {
+        const vol  = alvoD / dSel;            // litros em 24 h
+        const taxa = vol * 1000 / 24;         // mL/h
+        A.push('  Meta:   ' + (alvoD > 0 ? '+' : '−') + n1(Math.abs(alvoD)) + ' mEq/L em 24 h');
+        A.push('  Volume: ' + n2(vol) + ' L (' + n0(vol * 1000) + ' mL) em 24 h');
+        A.push('  Taxa:   ' + n0(taxa) + ' mL/h');
+        if (sol.prep) {
+            A.push('  Preparo: ' + sol.prep);
+            if (/= 500 mL/.test(sol.prep)) {
+                const bolsas = Math.ceil(vol * 1000 / 500);
+                A.push('  Aviar:   ' + bolsas + ' bolsa' + (bolsas > 1 ? 's' : '') + ' de 500 mL para cobrir as 24 h');
+            }
+        }
+        if (vol > 6) {
+            A.push('  ⚠ Volume elevado — avaliar sobrecarga hídrica e considerar solução mais concentrada.');
+        }
+        if (alvoD > 8) {
+            A.push('  ⚠ ΔNa⁺ > 8 mEq/L/24 h excede o limite de segurança para hiponatremia (risco de SDO).');
+        }
+        if (alvoD < -10) {
+            A.push('  ⚠ ΔNa⁺ < −10 mEq/L/24 h excede o limite para hipernatremia crônica (risco de edema cerebral).');
+        }
+    }
+
+    if (sol.alerta) {
+        A.push('');
+        A.push('⚠ ' + sol.alerta);
+    }
+
+    A.push('');
+    A.push('⚠ FÓRMULA ESTÁTICA — o que ela NÃO considera:');
+    A.push('  perdas urinárias, insensíveis e do TGI, ingesta oral de água e mudanças na');
+    A.push('  excreção renal ao longo do tratamento.');
+    A.push('  Na hiponatremia costuma SUBESTIMAR a elevação real, sobretudo quando a causa é');
+    A.push('  corrigida durante a infusão (volume reposto, tiazídico suspenso, SIADH resolvido):');
+    A.push('  instala-se diurese aquosa e o Na⁺ sobe sozinho, além do previsto.');
+    A.push('  Serve para definir a taxa INICIAL. A conduta é guiada pela dosagem seriada de Na⁺,');
+    A.push('  não pela fórmula.');
+
+    setResult('resultadoAM', A.join('\n'));
+}
+
+(function initSolucoes() {
+    const sel = document.getElementById('amSolucao');
+    if (!sel) return;
+    SOLUCOES.forEach((s, i) => {
+        const o = document.createElement('option');
+        o.value = String(i);
+        o.textContent = s.name;
+        sel.appendChild(o);
+    });
+})();
+
+// ── ABAS ─────────────────────────────────────────────────────
+
+const ABAS = ['transcricao', 'gasometria', 'disnatremia', 'dva'];
+
+function trocarAba(nome) {
+    if (!ABAS.includes(nome)) nome = ABAS[0];
+    document.querySelectorAll('.tab-panel').forEach(p => {
+        p.classList.toggle('active', p.id === 'aba-' + nome);
+    });
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.setAttribute('aria-selected', b.dataset.aba === nome ? 'true' : 'false');
+    });
+    try { history.replaceState(null, '', '#' + nome); } catch (e) {}
+    window.scrollTo(0, 0);
+}
+
+(function initAbas() {
+    const h = (location.hash || '').replace('#', '');
+    trocarAba(ABAS.includes(h) ? h : ABAS[0]);
+})();
 </script>
-<!-- Vercel Web Analytics -->
-<script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
