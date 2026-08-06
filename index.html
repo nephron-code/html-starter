@@ -123,6 +123,9 @@
         @media (max-width: 939px) {
             .fluxo-wrap svg { min-width: 880px; }
         }
+        .calc-row.check { flex-direction: row; align-items: center; gap: 8px; }
+        .calc-row.check input[type="checkbox"] { width: auto; margin: 0; }
+        .calc-row.check label { margin: 0; cursor: pointer; }
         .algo-nota { font-size: 12px; color: #666; line-height: 1.6; margin: 12px 0 0;
                      max-width: 900px; border-left: 3px solid #d0d0d0; padding-left: 10px; }
         .algo-nota strong { color: #333; }
@@ -145,6 +148,7 @@
     <nav class="tabs" role="tablist">
         <button class="tab-btn" role="tab" data-aba="transcricao" aria-selected="true"  aria-controls="aba-transcricao" onclick="trocarAba('transcricao')">Transcrição</button>
         <button class="tab-btn" role="tab" data-aba="gasometria"  aria-selected="false" aria-controls="aba-gasometria"  onclick="trocarAba('gasometria')">Gasometria</button>
+        <button class="tab-btn" role="tab" data-aba="funcao-renal" aria-selected="false" aria-controls="aba-funcao-renal" onclick="trocarAba('funcao-renal')">Função Renal</button>
         <button class="tab-btn" role="tab" data-aba="disnatremia" aria-selected="false" aria-controls="aba-disnatremia" onclick="trocarAba('disnatremia')">Disnatremias</button>
         <button class="tab-btn" role="tab" data-aba="dva"         aria-selected="false" aria-controls="aba-dva"         onclick="trocarAba('dva')">DVA / Sedação</button>
     </nav>
@@ -246,6 +250,89 @@
 </div>
 
 </div><!-- /aba-gasometria -->
+
+<!-- ═══ ABA: FUNÇÃO RENAL ═══ -->
+<div class="tab-panel" id="aba-funcao-renal" role="tabpanel">
+
+<!-- SEÇÃO 9: DADOS + CKD-EPI -->
+<div class="section">
+    <h3>TFG Estimada — CKD-EPI 2021</h3>
+    <p class="hint">Idade, sexo e creatinina são obrigatórios. Peso e altura liberam a TFG absoluta e o Cockcroft-Gault abaixo.</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>Idade (anos)</label>
+            <input type="number" id="frIdade" min="1" max="120" step="1" placeholder="ex: 62" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row">
+            <label>Sexo</label>
+            <select id="frSexo" onchange="calcFuncaoRenal()">
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select>
+        </div>
+        <div class="calc-row">
+            <label>Creatinina sérica (mg/dL)</label>
+            <input type="number" id="frCr" min="0.1" max="30" step="0.01" placeholder="ex: 1,4" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row">
+            <label>Cistatina C (mg/L) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="frCys" min="0.1" max="10" step="0.01" placeholder="equação combinada" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row">
+            <label>Peso (kg) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="frPeso" min="2" max="300" step="0.5" placeholder="ex: 70" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row">
+            <label>Altura (cm) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="frAltura" min="50" max="230" step="1" placeholder="ex: 168" oninput="calcFuncaoRenal()">
+        </div>
+    </div>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoTFG')">Copiar resultado</button>
+        <button class="secondary" onclick="limparFuncaoRenal()">Limpar</button>
+    </div>
+    <div class="resultado" id="resultadoTFG">Informe idade, sexo e creatinina.</div>
+</div>
+
+<!-- SEÇÃO 10: COCKCROFT-GAULT -->
+<div class="section">
+    <h3>Cockcroft-Gault</h3>
+    <p class="hint">Usa os dados acima. Requer peso; a altura acrescenta peso ideal e ajustado.</p>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoCG')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoCG">Informe idade, sexo, creatinina e peso.</div>
+</div>
+
+<!-- SEÇÃO 11: ESTADIAMENTO IRA -->
+<div class="section">
+    <h3>IRA — Estadiamento KDIGO</h3>
+    <p class="hint">Creatinina atual e peso vêm dos campos acima. Informe o basal e, se houver, a diurese do período.</p>
+    <div class="calc-form">
+        <div class="calc-row">
+            <label>Creatinina basal (mg/dL)</label>
+            <input type="number" id="iraBasal" min="0.1" max="30" step="0.01" placeholder="ex: 1,0" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row">
+            <label>Diurese do período (mL) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="iraVol" min="0" max="20000" step="10" placeholder="ex: 300" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row">
+            <label>Período considerado (h) <span style="color:#bbb;font-size:11px">opcional</span></label>
+            <input type="number" id="iraHoras" min="1" max="72" step="1" placeholder="ex: 24" oninput="calcFuncaoRenal()">
+        </div>
+        <div class="calc-row check">
+            <input type="checkbox" id="iraTRS" onchange="calcFuncaoRenal()">
+            <label for="iraTRS">Terapia renal substitutiva iniciada</label>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="secondary" onclick="copiarResultado('resultadoIRA')">Copiar resultado</button>
+    </div>
+    <div class="resultado" id="resultadoIRA">Informe creatinina basal e atual.</div>
+</div>
+
+</div><!-- /aba-funcao-renal -->
 
 <!-- ═══ ABA: DISNATREMIAS ═══ -->
 <div class="tab-panel" id="aba-disnatremia" role="tabpanel">
@@ -1316,6 +1403,236 @@ function interpretarGaso() {
     setResult('resultadoGaso', formatGasoInterpretation(r, inp));
 }
 
+// ── SEÇÃO 7: FUNÇÃO RENAL (CKD-EPI / COCKCROFT-GAULT / IRA) ──
+
+// CKD-EPI 2021 creatinina (sem coeficiente racial) — Inker NEJM 2021
+function ckdEpi2021(cr, idade, sexoF) {
+    const k = sexoF ? 0.7 : 0.9;
+    const a = sexoF ? -0.241 : -0.302;
+    return 142 * Math.pow(Math.min(cr / k, 1), a)
+               * Math.pow(Math.max(cr / k, 1), -1.200)
+               * Math.pow(0.9938, idade)
+               * (sexoF ? 1.012 : 1);
+}
+
+// CKD-EPI 2009 creatinina, coeficiente sem ajuste racial — referência histórica
+function ckdEpi2009(cr, idade, sexoF) {
+    const k = sexoF ? 0.7 : 0.9;
+    const a = sexoF ? -0.329 : -0.411;
+    return 141 * Math.pow(Math.min(cr / k, 1), a)
+               * Math.pow(Math.max(cr / k, 1), -1.209)
+               * Math.pow(0.993, idade)
+               * (sexoF ? 1.018 : 1);
+}
+
+// CKD-EPI 2021 creatinina + cistatina C
+function ckdEpiCrCys(cr, cys, idade, sexoF) {
+    const k = sexoF ? 0.7 : 0.9;
+    const a = sexoF ? -0.219 : -0.144;
+    return 135 * Math.pow(Math.min(cr / k, 1), a)
+               * Math.pow(Math.max(cr / k, 1), -0.544)
+               * Math.pow(Math.min(cys / 0.8, 1), -0.323)
+               * Math.pow(Math.max(cys / 0.8, 1), -0.778)
+               * Math.pow(0.9961, idade)
+               * (sexoF ? 0.963 : 1);
+}
+
+function categoriaG(tfg) {
+    if (tfg >= 90) return 'G1 — normal ou elevada';
+    if (tfg >= 60) return 'G2 — levemente reduzida';
+    if (tfg >= 45) return 'G3a — leve a moderadamente reduzida';
+    if (tfg >= 30) return 'G3b — moderada a gravemente reduzida';
+    if (tfg >= 15) return 'G4 — gravemente reduzida';
+    return 'G5 — falência renal';
+}
+
+function limparFuncaoRenal() {
+    ['frIdade','frCr','frCys','frPeso','frAltura','iraBasal','iraVol','iraHoras']
+        .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('frSexo').selectedIndex = 0;
+    document.getElementById('iraTRS').checked = false;
+    setResult('resultadoTFG', 'Informe idade, sexo e creatinina.');
+    setResult('resultadoCG',  'Informe idade, sexo, creatinina e peso.');
+    setResult('resultadoIRA', 'Informe creatinina basal e atual.');
+}
+
+function calcFuncaoRenal() {
+    const el = id => document.getElementById(id);
+    const n0 = n => Math.round(n).toString();
+    const n1 = n => n.toFixed(1).replace('.', ',');
+    const n2 = n => n.toFixed(2).replace('.', ',');
+
+    const idade  = toFloat(el('frIdade').value);
+    const sexoF  = el('frSexo').value === 'F';
+    const cr     = toFloat(el('frCr').value);
+    const cys    = toFloat(el('frCys').value);
+    const peso   = toFloat(el('frPeso').value);
+    const altura = toFloat(el('frAltura').value);
+
+    // ── CKD-EPI ──
+    if (isNaN(idade) || idade <= 0 || isNaN(cr) || cr <= 0) {
+        setResult('resultadoTFG', 'Informe idade, sexo e creatinina.');
+    } else {
+        const T = [];
+        const tfg = ckdEpi2021(cr, idade, sexoF);
+        T.push('CKD-EPI 2021 (creatinina)');
+        T.push('  ' + n0(tfg) + ' mL/min/1,73m²   →   ' + categoriaG(tfg));
+
+        if (!isNaN(cys) && cys > 0) {
+            const tfgC = ckdEpiCrCys(cr, cys, idade, sexoF);
+            T.push('');
+            T.push('CKD-EPI 2021 (creatinina + cistatina C)');
+            T.push('  ' + n0(tfgC) + ' mL/min/1,73m²   →   ' + categoriaG(tfgC));
+            const dif = Math.abs(tfgC - tfg) / tfg * 100;
+            if (dif > 20) {
+                T.push('  ⚠ Discordância > 20% entre as equações. A combinada é a mais acurada e');
+                T.push('    deve prevalecer (KDIGO 2024). Divergência grande sugere interferência');
+                T.push('    na creatinina (massa muscular, dieta, amputação) ou na cistatina');
+                T.push('    (corticoide, tireoidopatia, obesidade, inflamação).');
+            }
+        }
+
+        T.push('');
+        T.push('Referência: CKD-EPI 2009 sem ajuste racial = ' + n0(ckdEpi2009(cr, idade, sexoF)) + ' mL/min/1,73m²');
+
+        if (!isNaN(peso) && peso > 0 && !isNaN(altura) && altura > 0) {
+            const sc = 0.007184 * Math.pow(altura, 0.725) * Math.pow(peso, 0.425);  // DuBois
+            T.push('');
+            T.push('TFG ABSOLUTA (desindexada pela superfície corporal)');
+            T.push('  SC (DuBois) = ' + n2(sc) + ' m²');
+            T.push('  ' + n0(tfg * sc / 1.73) + ' mL/min');
+            T.push('  → é este o valor para ajuste de dose de fármacos; o indexado serve para');
+            T.push('    estadiamento e comparação populacional.');
+        }
+
+        T.push('');
+        T.push('CATEGORIAS G (KDIGO)');
+        T.push('  G1 ≥90 | G2 60–89 | G3a 45–59 | G3b 30–44 | G4 15–29 | G5 <15');
+        T.push('  ⚠ G1 e G2 só configuram DRC se houver marcador de lesão renal (albuminúria,');
+        T.push('    alteração de imagem, histologia, tubulopatia) por ≥ 3 meses.');
+        T.push('  ⚠ Equação validada em função renal ESTÁVEL. Não se aplica a creatinina em');
+        T.push('    ascensão ou queda — na IRA, a TFG estimada não tem significado.');
+        if (idade < 18) {
+            T.push('  ⚠ Idade < 18 anos: CKD-EPI não é validada em pediatria — usar Schwartz.');
+        }
+        setResult('resultadoTFG', T.join('\n'));
+    }
+
+    // ── COCKCROFT-GAULT ──
+    if (isNaN(idade) || idade <= 0 || isNaN(cr) || cr <= 0 || isNaN(peso) || peso <= 0) {
+        setResult('resultadoCG', 'Informe idade, sexo, creatinina e peso.');
+    } else {
+        const G = [];
+        const cg = p => (140 - idade) * p / (72 * cr) * (sexoF ? 0.85 : 1);
+        G.push('COCKCROFT-GAULT — depuração estimada de creatinina');
+        G.push('  Peso real (' + n1(peso) + ' kg): ' + n0(cg(peso)) + ' mL/min');
+
+        if (!isNaN(altura) && altura > 0) {
+            const pol = altura / 2.54;
+            const pi  = (sexoF ? 45.5 : 50) + 2.3 * Math.max(0, pol - 60);
+            const imc = peso / Math.pow(altura / 100, 2);
+            G.push('  Peso ideal (Devine, ' + n1(pi) + ' kg): ' + n0(cg(pi)) + ' mL/min');
+            if (peso > pi) {
+                const pa = pi + 0.4 * (peso - pi);
+                G.push('  Peso ajustado (' + n1(pa) + ' kg): ' + n0(cg(pa)) + ' mL/min');
+            }
+            G.push('');
+            G.push('  IMC = ' + n1(imc) + ' kg/m²');
+            if (imc >= 30) {
+                G.push('  → IMC ≥ 30: preferir o peso AJUSTADO. O peso real superestima a depuração.');
+            } else if (imc < 18.5) {
+                G.push('  → IMC < 18,5: peso real tende a subestimar; atenção à baixa massa muscular,');
+                G.push('    que reduz a creatinina e mascara a disfunção renal.');
+            } else {
+                G.push('  → IMC na faixa normal: peso real é adequado.');
+            }
+        } else {
+            G.push('  (informe a altura para peso ideal e ajustado)');
+        }
+
+        G.push('');
+        G.push('  ⚠ Resultado em mL/min, NÃO indexado por superfície corporal — não comparar');
+        G.push('    diretamente com o CKD-EPI acima.');
+        G.push('  ⚠ Superestima a TFG real (secreção tubular de creatinina), mas boa parte das');
+        G.push('    bulas e tabelas de ajuste de dose ainda é referenciada a esta equação.');
+        setResult('resultadoCG', G.join('\n'));
+    }
+
+    // ── ESTADIAMENTO KDIGO DE IRA ──
+    const basal = toFloat(el('iraBasal').value);
+    const vol   = toFloat(el('iraVol').value);
+    const horas = toFloat(el('iraHoras').value);
+    const trs   = el('iraTRS').checked;
+
+    const A = [];
+    let stCr = null, stDiu = null;
+
+    if (!isNaN(basal) && basal > 0 && !isNaN(cr) && cr > 0) {
+        const razao = cr / basal;
+        const delta = cr - basal;
+        A.push('CRITÉRIO CREATININA');
+        A.push('  ' + n2(basal) + ' → ' + n2(cr) + ' mg/dL   |   ×' + n2(razao) +
+               '   |   Δ ' + (delta >= 0 ? '+' : '−') + n2(Math.abs(delta)) + ' mg/dL');
+        const agudo = (delta >= 0.3) || (razao >= 1.5);
+        if (razao >= 3.0)                  stCr = 3;
+        else if (cr >= 4.0 && agudo)       stCr = 3;
+        else if (razao >= 2.0)             stCr = 2;
+        else if (agudo)                    stCr = 1;
+        else                               stCr = 0;
+        A.push('  → ' + (stCr === 0 ? 'não preenche critério de IRA' : 'ESTÁGIO ' + stCr));
+    }
+
+    if (!isNaN(vol) && !isNaN(horas) && horas > 0 && !isNaN(peso) && peso > 0) {
+        const ml = vol / (peso * horas);
+        A.push(A.length ? '' : '');
+        A.push('CRITÉRIO DIURESE');
+        A.push('  ' + n0(vol) + ' mL em ' + n0(horas) + ' h  ÷  ' + n1(peso) + ' kg  =  ' + n2(ml) + ' mL/kg/h');
+        const anuria = ml < 0.05;
+        if (ml < 0.3 && horas >= 24)       stDiu = 3;
+        else if (anuria && horas >= 12)    stDiu = 3;
+        else if (ml < 0.5 && horas >= 12)  stDiu = 2;
+        else if (ml < 0.5 && horas >= 6)   stDiu = 1;
+        else                               stDiu = 0;
+        A.push('  → ' + (stDiu === 0 ? 'não preenche critério de IRA' : 'ESTÁGIO ' + stDiu));
+        if (horas < 6) A.push('  ⚠ Período < 6 h não permite estadiar pela diurese.');
+    } else if (!isNaN(vol) && (isNaN(peso) || peso <= 0)) {
+        A.push('');
+        A.push('CRITÉRIO DIURESE: informe o peso acima para calcular mL/kg/h.');
+    }
+
+    if (stCr === null && stDiu === null && !trs) {
+        setResult('resultadoIRA', 'Informe creatinina basal e atual.');
+    } else {
+        const cands = [stCr, stDiu].filter(s => s !== null);
+        let final = cands.length ? Math.max.apply(null, cands) : 0;
+        if (trs) final = 3;
+        A.push('');
+        if (trs) A.push('Terapia renal substitutiva iniciada → estágio 3 por definição.');
+        A.push('════ ESTÁGIO KDIGO: ' + (final === 0 ? 'não caracteriza IRA' : final) + ' ════');
+        if (cands.length === 2 && stCr !== stDiu && !trs) {
+            A.push('(vale o maior entre os dois critérios)');
+        }
+        A.push('');
+        A.push('DEFINIÇÃO DE IRA — qualquer um dos três');
+        A.push('  ↑ creatinina ≥ 0,3 mg/dL em 48 h');
+        A.push('  ↑ creatinina ≥ 1,5× o basal (conhecido ou presumido) nos últimos 7 dias');
+        A.push('  diurese < 0,5 mL/kg/h por 6 h');
+        A.push('');
+        A.push('ESTÁGIOS');
+        A.push('  1: 1,5–1,9× basal ou ↑ ≥ 0,3 mg/dL   |   diurese < 0,5 mL/kg/h por 6–12 h');
+        A.push('  2: 2,0–2,9× basal                     |   diurese < 0,5 mL/kg/h por ≥ 12 h');
+        A.push('  3: ≥ 3,0× basal, creatinina ≥ 4,0 mg/dL ou início de TRS');
+        A.push('     |   diurese < 0,3 mL/kg/h por ≥ 24 h ou anúria ≥ 12 h');
+        A.push('');
+        A.push('  ⚠ Avalia UMA janela de tempo. O estágio real é o pior período sustentado —');
+        A.push('    reavaliar a cada balanço.');
+        A.push('  ⚠ Balanço hídrico positivo dilui a creatinina e subestima o estágio.');
+        A.push('  ⚠ Sem basal conhecido, o valor presumido pelo nadir da internação ou por');
+        A.push('    TFG retroestimada introduz erro relevante — registrar a premissa usada.');
+        setResult('resultadoIRA', A.join('\n'));
+    }
+}
+
 // ── SEÇÃO 6: DISNATREMIAS ────────────────────────────────────
 
 const ACT_FATOR = {
@@ -1536,7 +1853,7 @@ function calcNa() {
 
 // ── ABAS ─────────────────────────────────────────────────────
 
-const ABAS = ['transcricao', 'gasometria', 'disnatremia', 'dva'];
+const ABAS = ['transcricao', 'gasometria', 'funcao-renal', 'disnatremia', 'dva'];
 
 function trocarAba(nome) {
     if (!ABAS.includes(nome)) nome = ABAS[0];
