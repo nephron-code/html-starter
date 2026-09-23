@@ -882,7 +882,8 @@ function parseUrina(t) {
         ph:            g(/P\.?H\.?:\s*([\d,\.]+)/i),
         densidade:     g(/DENSIDADE:\s*([\d,\.]+)/i),
         leuco:         g(/LEUCOCITOS:\s*([^\s\n]+)/i),
-        hemacias:      g(/HEMACIAS:\s*([^\s\n]+)/i),
+        // Coluna direita da sedimentoscopia: valor vai até o fim da linha ("5 p/c")
+        hemacias:      g(/HEM[AÁ]CIAS\s*:\s*([^\s:][^\n:]*?)[ \t]*(?=\n|$)/i),
         nitrito:       g(/NITRITO:\s*([^\s\n]+)/i),
         proteinas:     g(/PROTEINAS:\s*([^\s\n]+)/i),
         glicose:       g(/GLICOSE:\s*([^\s\n]+)/i),
@@ -890,8 +891,9 @@ function parseUrina(t) {
         bilirrubina:   g(/BILIRRUBINA:\s*([^\s\n]+)/i),
         urobilinogenio:g(/UROBILINOGENIO:\s*([^\s\n]+)/i),
         corposcetonico:g(/CORPOSCETONICO:\s*([^\s\n]+)/i),
-        piocitos:      g(/PIOCITOS:\s*([^\s\n]+)/i),
-        aspecto:       g(/ASPECTO:\s*([^\s\n]+)/i),
+        piocitos:      g(/PI[OÓ]CITOS\s*:\s*([^\s:][^\n:]*?)[ \t]*(?=\n|$)/i),
+        // Coluna esquerda: valor vai até o rótulo da coluna direita ("LIGEIRAMENTE TURVO Hemacias:")
+        aspecto:       g(/ASPECTO\s*:\s*([^\s:][^\n:]*?)(?=[ \t]+(?:HEM[AÁ]CIAS|PI[OÓ]CITOS)\s*:|[ \t]*(?:\n|$))/i),
     };
 }
 

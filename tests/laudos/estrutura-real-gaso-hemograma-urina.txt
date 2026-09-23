@@ -1,0 +1,178 @@
+LABORATÓRIO DE ANÁLISES CLÍNICAS E ANATOMIA PATOLÓGICA
+Responsável Técnico: RESPONSAVEL TESTE CRBM0000
+UNIDADE DE ANALISES CLINICAS
+Paciente: PACIENTE FICTICIO
+Data de Nascimento: 01/01/1980
+Nro Identidade: 0000000
+Emissão do laudo: 15/03/2026
+Dr(a) MEDICO FICTICIO
+Origem: Internação
+Prontuário: 0000000/0
+Convênio: SUS
+Cartão SUS: 000000000000000
+Página 1
+Solicitação: 000001
+GASOMETRIA ARTERIAL
+EQUIPAMENTO: RAPIDPoint500
+VALORES DE REFERÊNCIA
+pH: 7,251 7,35 a 7,45
+PCO2: 28,40 mmHg 35,0 a 45,0 mmHg
+PO2: 92,00 mmHg 80,0 a 100,0 mmHg
+HCO3: 12,30 mmol/L 22,0 a 28,0 mmol/L
+BE: -12,10 mmol/L -2,0 a +2,0 mmol/L
+SO2: 96,00 % 95,0 a 99,0 %
+LACTATO
+:
+3,2 mmol/L 0,5 a 1,6 mmol/L
+Recebimento material: 14/03/26 09:12 Liberado em: 14/03/26 09:40
+Respirando em ar ambiente.
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+Solicitação: 000002
+Material SANGUE
+POTÁSSIO: 4,80 mEq/L
+Método: Íon seletivo
+Valores de Referência:
+Adultos: 3,5 a 5,2 mEq/L
+Recebimento material: 14/03/26 09:20 Liberado em: 14/03/26 10:05
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+Solicitação: 000002
+Material SANGUE
+SÓDIO: 133 mmol/L
+Método: Ion Seletivo
+Valores de Referência: 136 a 144 mmol/L
+OBS:
+Recebimento material: 14/03/26 09:20 Liberado em: 14/03/26 10:05
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+"Todo teste laboratorial deve ser correlacionado com o quadro clínico do paciente, sem o qual a interpretação do resultado é apenas relativa."
+ENDERECO FICTICIO - CEP 00000-000
+CNPJ: 00.000.000/0000-00 - Telefone (00) 0000-0000
+email: teste@exemplo.gov.br - homepage: www.exemplo.br
+LABORATÓRIO DE ANÁLISES CLÍNICAS E ANATOMIA PATOLÓGICA
+Responsável Técnico: RESPONSAVEL TESTE CRBM0000
+UNIDADE DE ANALISES CLINICAS
+Paciente: PACIENTE FICTICIO
+Data de Nascimento: 01/01/1980
+Nro Identidade: 0000000
+Emissão do laudo: 15/03/2026
+Dr(a) MEDICO FICTICIO
+Origem: Internação
+Prontuário: 0000000/0
+Convênio: SUS
+Cartão SUS: 000000000000000
+Página 2
+Solicitação: 000002
+CREATININA: 2,35 mg/dL Valores de Referência:
+Método: Colorimétrico (Jaffe)
+Valor de referência:
+Homens: 0.7 - 1,3 mg/dL
+Mulheres: 0.6 - 1.1 mg/dL
+Recebimento material: 14/03/26 09:20 Liberado em: 14/03/26 10:04
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+Solicitação: 000002
+Material SANGUE
+UREIA: 118 mg/dL
+Método: Enzimático UV
+Valores de Referência: Adulto/Homem: 15 a 45
+mg/dl
+Recebimento material: 14/03/26 09:20 Liberado em: 14/03/26 10:04
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+Solicitação: 000002
+HEMOGRAMA
+EQUIPAMENTO: SYSMEX XN-350 VALORES DE REFERÊNCIA
+HOMENS MULHERES
+ERITRÓCITOS: 3,80 milhões/μL 4,5 - 5,5 3,8 - 4,8 milhões/μL
+HEMOGLOBINA: 11,4 g/dL 13,0 - 17,0 12,0 - 15,0 g/dL
+HEMATÓCRITO: 33,6 % 40,0 - 50,0 36,0 - 46,0 %
+VCM: 88,4 fL 83,0 - 101,0 fL
+HCM: 30,0 pg 27,0 - 32,0 pg
+CHCM: 33,9 g/dL 31,5 - 34,5
+g/dL
+RDW
+(CV):
+13,1 % 11,0 - 14,5 %
+LEUCÓCITOS TOTAIS: 14200 /μL 4000 - 10000 /μL
+Nº RELATIVO Nº ABSOLUTO
+PROMIELÓCITOS: 0 % 0 /μL 0 % 0 /μL
+MIELÓCITOS: 0 % 0 /μL 0 % 0 /μL
+"Todo teste laboratorial deve ser correlacionado com o quadro clínico do paciente, sem o qual a interpretação do resultado é apenas relativa."
+ENDERECO FICTICIO - CEP 00000-000
+CNPJ: 00.000.000/0000-00 - Telefone (00) 0000-0000
+email: teste@exemplo.gov.br - homepage: www.exemplo.br
+LABORATÓRIO DE ANÁLISES CLÍNICAS E ANATOMIA PATOLÓGICA
+Responsável Técnico: RESPONSAVEL TESTE CRBM0000
+UNIDADE DE ANALISES CLINICAS
+Paciente: PACIENTE FICTICIO
+Data de Nascimento: 01/01/1980
+Nro Identidade: 0000000
+Emissão do laudo: 15/03/2026
+Dr(a) MEDICO FICTICIO
+Origem: Internação
+Prontuário: 0000000/0
+Convênio: SUS
+Cartão SUS: 000000000000000
+Página 3
+METAMIELÓCITOS: 0 % 0 /μL 0 % 0 /μL
+BASTÕES: 3 % 426 /μL 2 - 5 % 100 - 500 /μL
+SEGMENTADOS: 77 % 10934 /uL 36 - 66 % 1800 - 6600 /μL
+EOSINÓFILOS: 1 % 142 /μL 1 - 4 % 50 - 400 /μL
+BASÓFILOS: 0 % 0 /μL 0 - 2 % 0 - 200 /μL
+MONÓCITOS: 8 % 1136 /μL 3 - 10 % 150 - 1000 /μL
+LINFÓCITOS: 11 % 1562 /μL 22 - 44 % 1100 - 4400 /μL
+PLASMÓCITOS: 0 % 0 /μL 0 % 0 /μL
+BLASTOS: 0 % 0 /μL 0 % 0 /μL
+LINFÓCITOS ATÍPICOS: 0 % 0 /μL 0 % 0 /μL
+ERITROBLASTOS EM 100 LEUCÓCITOS:
+0
+PLAQUETAS/μL:
+198000
+VALOR DE REFERÊNCIA: 150000 - 400000/μL
+NOTAS:
+Novos valores de referência conforme PNCQ a partir de 01/04/2021.
+Recebimento material: 14/03/26 09:20 Liberado em: 14/03/26 09:58
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+ANTI HIV I/II(SANGUE) Solicitação: 000002
+PESQUISA DE ANTICORPOS ANTI-HIV 1 E 2
+RESULTADO: NÃO REAGENTE 0,15 Valor de referência: menor que 1.00
+Método:
+PESQUISA DE ANTICORPOS ANTI-HIV 1 E 2
+RESULTADO:
+Método:
+OBS:Resultado obtido com a utilização do fluxograma 1.
+Recebimento material: 14/03/26 09:20 Liberado em: 14/03/26 10:30
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+SUMÁRIO DE URINA(URINA) Solicitação: 000003
+Material URINA
+Carecterísticas gerais Sedimentoscopia
+Cor: Amarelo citrino Piocitos: 20 p/c
+"Todo teste laboratorial deve ser correlacionado com o quadro clínico do paciente, sem o qual a interpretação do resultado é apenas relativa."
+ENDERECO FICTICIO - CEP 00000-000
+CNPJ: 00.000.000/0000-00 - Telefone (00) 0000-0000
+email: teste@exemplo.gov.br - homepage: www.exemplo.br
+LABORATÓRIO DE ANÁLISES CLÍNICAS E ANATOMIA PATOLÓGICA
+Responsável Técnico: RESPONSAVEL TESTE CRBM0000
+UNIDADE DE ANALISES CLINICAS
+Paciente: PACIENTE FICTICIO
+Página 4
+Aspecto: LIGEIRAMENTE TURVO Hemacias: 5 p/c
+Densidade: 1015 Ur. Amorfo.:
+P.H.: 5,5 Fosf. Amorfo:
+Elementos anormais Trichomona.:
+Hemoglobina: + Fungos:
+Corposcetonico: AUSENTE Cel. Epitel:
+Bilirrubina: AUSENTE Muco:
+Urobilinogenio: AUSENTE Bacterias:
+Leucocitos: ++ Cilindros:
+Proteinas: AUSENTE
+Glicose: AUSENTE
+Nitrito: POSITIVO
+Recebimento material: 14/03/26 15:40 Liberado em: 14/03/26 16:20
+Exames conferidos e liberados digitalmente por:
+BIOMEDICO TESTE - CRBM : 0000
+"Todo teste laboratorial deve ser correlacionado com o quadro clínico do paciente, sem o qual a interpretação do resultado é apenas relativa."

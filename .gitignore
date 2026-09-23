@@ -6,3 +6,5 @@ package-lock.json
 .claude/
 AUTOLABS ABC.html
 PROMPT_REDESIGN_MINIMALISTA.md
+tests/powerfx/bin/
+tests/powerfx/obj/

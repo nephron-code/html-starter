@@ -1,0 +1,54 @@
+Hospital Universitário de Lagarto
+Paciente: FULANO
+LABORATÓRIO DE ANÁLISES CLÍNICAS
+GASOMETRIA ARTERIAL
+pH: 7,308 7,35 a 7,45
+pCO2: 32,1 mmHg
+pO2: 88 mmHg
+HCO3: 16,2 mmol/L
+BE: -8,1
+SO2: 96,2 %
+LACTATO
+:
+1,5
+Recebimento material: 07/06/26 11:16
+POTÁSSIO: 5,30 mEq/L
+Recebimento material: 07/06/26 11:26
+SÓDIO: 138 mEq/L
+Recebimento material: 07/06/26 11:26
+GASOMETRIA ARTERIAL
+pH: 7,352 7,35 a 7,45
+pCO2: 32,1 mmHg
+pO2: 88 mmHg
+HCO3: 16,2 mmol/L
+BE: -8,1
+SO2: 96,2 %
+LACTATO
+:
+1,5
+Recebimento material: 07/06/26 18:40
+POTÁSSIO: 4,90 mEq/L
+Recebimento material: 07/06/26 18:40
+HEMOGRAMA COMPLETO
+HEMOGLOBINA: 9,8 g/dL
+HEMATÓCRITO: 31,2 %
+LEUCÓCITOS TOTAIS: 12.300
+BASTÕES: 2 %
+SEGMENTADOS: 78 %
+LINFÓCITOS: 12 %
+PLAQUETAS/μL:
+274000
+Recebimento material: 07/06/26 06:00
+CREATININA: 1,82 mEq/L
+Recebimento material: 07/06/26 06:00
+SUMÁRIO DE URINA
+ASPECTO: TURVO
+P.H.: 6,5
+DENSIDADE: 1.015
+LEUCOCITOS: 25
+HEMACIAS: 5
+NITRITO: NEGATIVO
+PROTEINAS: AUSENTE
+HEMOGLOBINA: ++
+PIOCITOS: RAROS
+Recebimento material: 07/06/26 06:00

@@ -1,0 +1,26 @@
+Hospital Universitário de Lagarto
+Paciente: FULANO
+LABORATÓRIO DE ANÁLISES CLÍNICAS
+GASOMETRIA ARTERIAL
+pH: 7,308 7,35 a 7,45
+pCO2: 32,1 mmHg
+pO2: 88 mmHg
+HCO3: 16,2 mmol/L
+BE: -8,1
+SO2: 96,2 %
+LACTATO
+:
+1,5
+Recebimento material: 07/06/2026 11:16
+POTÁSSIO: 5,30 mEq/L
+Recebimento material: 07/06/2026 11:16
+HEMOGRAMA COMPLETO
+HEMOGLOBINA: 10,2 g/dL
+HEMATÓCRITO: 31,2 %
+LEUCÓCITOS TOTAIS: 12.300
+BASTÕES: 2 %
+SEGMENTADOS: 78 %
+LINFÓCITOS: 12 %
+PLAQUETAS/μL:
+561000
+Recebimento material: 07/06/2026 11:16
