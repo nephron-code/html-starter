@@ -931,14 +931,15 @@ function parseLaudo(text) {
     for (const date of sortedDates) {
         const timeMap = byDate[date];
         const sortedTimes = Object.keys(timeMap).sort();
+        const dayLines = [];
 
         if (sortedTimes.length === 1) {
             // Único horário no dia → sem hora em tudo
             const t = sortedTimes[0];
-            const line = buildMainLine(date, null, timeMap[t].exams);
-            if (line) lines.push(line);
-            if (timeMap[t].gaso)  { const l = buildGasoLine(date, null, timeMap[t].gaso);   if (l) lines.push(l); }
-            if (timeMap[t].urina) { const l = buildUrinaLine(date, null, timeMap[t].urina); if (l) lines.push(l); }
+            const line = buildMainLine(null, timeMap[t].exams);
+            if (line) dayLines.push(line);
+            if (timeMap[t].gaso)  { const l = buildGasoLine(null, timeMap[t].gaso);   if (l) dayLines.push(l); }
+            if (timeMap[t].urina) { const l = buildUrinaLine(null, timeMap[t].urina); if (l) dayLines.push(l); }
         } else {
             // Múltiplos horários:
             // exames com UMA ocorrência no dia → linha única sem hora (no topo)
@@ -958,8 +959,8 @@ function parseLaudo(text) {
                     if (keyCounts[k] === 1) singleExams[k] = v;
                 }
             }
-            const singleLine = buildMainLine(date, null, singleExams);
-            if (singleLine) lines.push(singleLine);
+            const singleLine = buildMainLine(null, singleExams);
+            if (singleLine) dayLines.push(singleLine);
 
             // Linhas por horário (exames que aparecem mais de uma vez)
             for (const t of sortedTimes) {
@@ -967,24 +968,30 @@ function parseLaudo(text) {
                     Object.entries(timeMap[t].exams).filter(([k]) => keyCounts[k] > 1)
                 );
                 if (Object.keys(multiExams).length > 0) {
-                    const line = buildMainLine(date, t, multiExams);
-                    if (line) lines.push(line);
+                    const line = buildMainLine(t, multiExams);
+                    if (line) dayLines.push(line);
                 }
             }
 
             // Gasometria
             const gasoTimes = sortedTimes.filter(t => timeMap[t].gaso !== null);
             for (const t of gasoTimes) {
-                const line = buildGasoLine(date, gasoTimes.length > 1 ? t : null, timeMap[t].gaso);
-                if (line) lines.push(line);
+                const line = buildGasoLine(gasoTimes.length > 1 ? t : null, timeMap[t].gaso);
+                if (line) dayLines.push(line);
             }
 
             // Urina — sempre linha própria
             const urinaTimes = sortedTimes.filter(t => timeMap[t].urina !== null);
             for (const t of urinaTimes) {
-                const line = buildUrinaLine(date, urinaTimes.length > 1 ? t : null, timeMap[t].urina);
-                if (line) lines.push(line);
+                const line = buildUrinaLine(urinaTimes.length > 1 ? t : null, timeMap[t].urina);
+                if (line) dayLines.push(line);
             }
+        }
+
+        // Data como tópico; exames do dia abaixo dela; linha em branco entre datas
+        if (dayLines.length) {
+            if (lines.length) lines.push('');
+            lines.push('• ' + date, ...dayLines);
         }
     }
 
@@ -995,7 +1002,7 @@ function parseLaudo(text) {
     return lines.join('\n');
 }
 
-function buildMainLine(date, time, e) {
+function buildMainLine(time, e) {
     const parts = [];
     if (e.hb) parts.push('Hb: ' + e.hb);
     if (e.ht) parts.push('Ht: ' + e.ht);
@@ -1026,11 +1033,11 @@ function buildMainLine(date, time, e) {
     }
     if (e.hiv) parts.push('Anti-HIV: ' + (/N[ÃA]O/i.test(e.hiv) ? 'Não reagente' : 'REAGENTE ⚠️'));
     if (!parts.length) return null;
-    const prefix = time ? date + ' ' + time : date;
-    return prefix + ': ' + parts.join(' | ');
+    // Data fica no tópico ("• DD/MM/AA"); aqui só a hora, quando houver
+    return (time ? time + ': ' : '') + parts.join(' | ');
 }
 
-function buildGasoLine(date, time, v) {
+function buildGasoLine(time, v) {
     const p = [];
     if (v.ph)      p.push('pH ' + v.ph);
     if (v.pco2)    p.push('pCO2 ' + v.pco2);
@@ -1040,11 +1047,11 @@ function buildGasoLine(date, time, v) {
     if (v.so2)     p.push('Sat ' + v.so2 + '%');
     if (v.lactato) p.push('Lact ' + v.lactato);
     if (!p.length) return null;
-    const prefix = time ? 'Gaso ' + date + ' ' + time : 'Gaso ' + date;
+    const prefix = time ? 'Gaso ' + time : 'Gaso';
     return prefix + ': ' + p.join(' | ');
 }
 
-function buildUrinaLine(date, time, v) {
+function buildUrinaLine(time, v) {
     const p = [];
     if (v.aspecto && !/L[IÍ]MPIDO|AMARELO CLARO/i.test(v.aspecto)) p.push('Asp ' + v.aspecto);
     if (v.ph)        p.push('pH ' + v.ph);
@@ -1060,7 +1067,7 @@ function buildUrinaLine(date, time, v) {
     if (v.corposcetonico && !isAbsent(v.corposcetonico)) p.push('Cetona ' + v.corposcetonico);
     if (v.piocitos && !isAbsent(v.piocitos)) p.push('Piócitos ' + v.piocitos);
     if (!p.length) return null;
-    const prefix = time ? 'Urina ' + date + ' ' + time : 'Urina ' + date;
+    const prefix = time ? 'Urina ' + time : 'Urina';
     return prefix + ': ' + p.join(' | ');
 }
 

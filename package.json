@@ -4,6 +4,7 @@
     "@vercel/edge": "^0.1.2"
   },
   "scripts": {
-    "test:exames": "node tests/equivalencia-exames.js"
+    "test:exames": "node tests/equivalencia-exames.js",
+    "gerar:tela": "node powerapps/gerar-tela.js"
   }
 }

@@ -220,12 +220,14 @@ With({
             gd: Sort(Filter(Gm; data = d.Value); hora);
             ud: Sort(Filter(Um; data = d.Value); hora)
         };
-        // Linhas de exames (data pura primeiro, depois uma por horário)
+        // Data como tópico; exames do dia abaixo dela; linha em branco entre datas
+        With({corpo:
+        // Linhas de exames (sem hora primeiro, depois uma por horário)
         Concat(slots As sl;
             With({S: Filter(Ms; data = d.Value && slot = sl.s)};
             With({partes: Filter(Sort(S; o); !IsBlank(v) && o < 90)};
             If(IsEmpty(partes); "";
-                d.Value & If(sl.s <> ""; " " & sl.s) & ": " &
+                If(sl.s <> ""; sl.s & ": ") &
                 Concat(partes;
                     Switch(c;
                         "leuco"; "Leuco: " & v & With({
@@ -254,7 +256,7 @@ With({
                     {x: If(!IsBlank(so2); "Sat " & so2 & "%")};
                     {x: If(!IsBlank(lact); "Lact " & lact)}
                 ); !IsBlank(x)); x; " | ")};
-            If(gp = ""; ""; "Gaso " & d.Value & If(CountRows(gd) > 1; " " & hora) & ": " & gp & Char(10))))
+            If(gp = ""; ""; "Gaso" & If(CountRows(gd) > 1; " " & hora) & ": " & gp & Char(10))))
         &
         // Urina — sempre linha própria
         Concat(ud;
@@ -273,10 +275,13 @@ With({
                     {x: If(!IsBlank(cet) && !IsMatch(cet; "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$"; MatchOptions.IgnoreCase); "Cetona " & cet)};
                     {x: If(!IsBlank(pio) && !IsMatch(pio; "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$"; MatchOptions.IgnoreCase); "Piócitos " & pio)}
                 ); !IsBlank(x)); x; " | ")};
-            If(up = ""; ""; "Urina " & d.Value & If(CountRows(ud) > 1; " " & hora) & ": " & up & Char(10))))
+            If(up = ""; ""; "Urina" & If(CountRows(ud) > 1; " " & hora) & ": " & up & Char(10))))
+        };
+        If(corpo = ""; ""; "• " & d.Value & Char(10) & corpo & Char(10)))
         ))
 };
-With({linhas: Left(Saida; Len(Saida) - 1)};
+// Cada data termina com uma linha em branco; remove a última
+With({linhas: Left(Saida; Len(Saida) - 2)};
     If(Saida = ""; "Nenhum exame reconhecido.";
     If(temBlasto;
         "****ATENÇÃO PARA PRESENÇA DE BLASTOS****" & Char(10) & linhas & Char(10) & "****ATENÇÃO PARA PRESENÇA DE BLASTOS****";

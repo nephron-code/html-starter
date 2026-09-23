@@ -1,0 +1,466 @@
+- Titulo:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(26, 35, 126, 1)
+      X: =40
+      Y: =20
+      Width: =800
+      Height: =44
+      Text: ="Interno++ · Exames"
+      Size: =22
+      FontWeight: =FontWeight.Semibold
+- Subtitulo:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(136, 136, 136, 1)
+      X: =40
+      Y: =62
+      Width: =1000
+      Height: =24
+      Text: ="Transcrição de exames do Laudo Individual do AGHU"
+      Size: =11
+- RotuloEntrada:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(51, 51, 51, 1)
+      X: =40
+      Y: =104
+      Width: =620
+      Height: =24
+      Text: ="LAUDO INDIVIDUAL"
+      Size: =11
+      FontWeight: =FontWeight.Semibold
+- DicaEntrada:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(153, 153, 153, 1)
+      X: =40
+      Y: =128
+      Width: =620
+      Height: =24
+      Text: |-
+        ="No AGHU: Laudo Individual → Ctrl+A → Ctrl+C → cole abaixo. Várias datas: cole uma após a outra."
+      Size: =9
+- TextInput1:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      X: =40
+      Y: =156
+      Width: =620
+      Height: =490
+      Default: =""
+      HintText: ="Cole o laudo aqui…"
+      Mode: =TextMode.MultiLine
+      Font: =Font.'Segoe UI'
+      Size: =10
+      Color: =RGBA(51, 51, 51, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      HoverFill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(208, 208, 208, 1)
+      BorderThickness: =1
+      HoverBorderColor: =RGBA(57, 73, 171, 1)
+      FocusedBorderColor: =RGBA(57, 73, 171, 1)
+      FocusedBorderThickness: =2
+      RadiusTopLeft: =4
+      RadiusTopRight: =4
+      RadiusBottomLeft: =4
+      RadiusBottomRight: =4
+      PaddingLeft: =10
+      PaddingRight: =10
+      PaddingTop: =8
+      PaddingBottom: =8
+- RotuloResultado:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(51, 51, 51, 1)
+      X: =700
+      Y: =104
+      Width: =626
+      Height: =24
+      Text: ="RESULTADO"
+      Size: =11
+      FontWeight: =FontWeight.Semibold
+- AvisoCulturas:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(153, 153, 153, 1)
+      X: =700
+      Y: =128
+      Width: =626
+      Height: =24
+      Text: ="⚠️ Culturas e anticorpos reumatológicos (FAN, FR) não são importados — transcreva manualmente."
+      Size: =9
+- Resultado:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(51, 51, 51, 1)
+      X: =700
+      Y: =156
+      Width: =626
+      Height: =490
+      Text: |-
+        =// Interno++ — motor de extração de exames (Power Fx, sintaxe pt-BR)
+        // Port de parseLaudo do index.html. Mantenha as duas versões em sincronia.
+        // Cole na propriedade Text do rótulo de resultado. Entrada: TextInput1.
+        //
+        // Diferenças forçadas pelo Power Fx:
+        // - regex precisa ser literal → um Match por exame (Switch abaixo)
+        // - não há replace com regex → em vez de normalizar "\n:" usa-se "\s*:" nos padrões
+        // - exames ficam numa tabela longa (bloco × exame) com coluna "p" = presente,
+        //   que reproduz a semântica de Object.assign/keyCounts do JS
+        With({Laudo: TextInput1.Text},
+        If(IsBlank(Trim(Laudo)), "Cole um laudo para extrair.",
+        With({Mt: MatchAll(Laudo, "Recebimento material\s*:\s*(?<d>\d{2}/\d{2}/(?:\d{4}|\d{2}))\s+(?<h>\d{2}:\d{2})", MatchOptions.IgnoreCase)},
+        If(IsEmpty(Mt), "Nenhum bloco encontrado." & Char(10) & "Verifique se o texto contém ""Recebimento material:"".",
+        With({
+            // Blocos: texto ANTES de cada "Recebimento material:" (no AGHU o marcador fica no final do exame)
+            B: ForAll(Sequence(CountRows(Mt)), With({
+                    m: Index(Mt, Value),
+                    ini: If(Value = 1, 1, Index(Mt, Value - 1).StartMatch + Len(Index(Mt, Value - 1).FullMatch))
+                },
+                {
+                    bi: Value,
+                    data: If(Len(m.d) = 10, Left(m.d, 6) & Right(m.d, 2), m.d),
+                    hora: m.h,
+                    texto: Mid(Laudo, ini, m.StartMatch - ini)
+                })),
+            // Exames: o = ordem de impressão (>= 90 não imprime sozinho), h = faz parte do hemograma
+            K: Table(
+                {o: 1, c: "hb", r: "Hb", h: true},
+                {o: 2, c: "ht", r: "Ht", h: true},
+                {o: 3, c: "leuco", r: "Leuco", h: true},
+                {o: 4, c: "plaq", r: "Plaq", h: true},
+                {o: 90, c: "neut", r: "Neut", h: true},
+                {o: 91, c: "linf", r: "Linf", h: true},
+                {o: 92, c: "bast", r: "Bast", h: true},
+                {o: 93, c: "blast", r: "Blast", h: true},
+                {o: 5, c: "cr", r: "Cr", h: false},
+                {o: 6, c: "ur", r: "Ur", h: false},
+                {o: 7, c: "k", r: "K", h: false},
+                {o: 8, c: "na", r: "Na", h: false},
+                {o: 9, c: "pcr", r: "PCR", h: false},
+                {o: 10, c: "tgo", r: "TGO", h: false},
+                {o: 11, c: "tgp", r: "TGP", h: false},
+                {o: 12, c: "glic", r: "Glic", h: false},
+                {o: 13, c: "ca", r: "Ca", h: false},
+                {o: 14, c: "mg", r: "Mg", h: false},
+                {o: 15, c: "p", r: "P", h: false},
+                {o: 16, c: "bil", r: "Bil", h: false},
+                {o: 17, c: "ggt", r: "GGT", h: false},
+                {o: 18, c: "fal", r: "FAL", h: false},
+                {o: 19, c: "alb", r: "Alb", h: false},
+                {o: 20, c: "dhl", r: "DHL", h: false},
+                {o: 21, c: "acur", r: "AcUr", h: false},
+                {o: 22, c: "hba1c", r: "HbA1c", h: false},
+                {o: 23, c: "tgl", r: "TGL", h: false},
+                {o: 24, c: "ct", r: "CT", h: false},
+                {o: 25, c: "hdl", r: "HDL", h: false},
+                {o: 26, c: "ldl", r: "LDL", h: false},
+                {o: 27, c: "tsh", r: "TSH", h: false},
+                {o: 28, c: "t4l", r: "T4L", h: false},
+                {o: 29, c: "vitd", r: "VitD", h: false},
+                {o: 30, c: "inr", r: "INR", h: false},
+                {o: 31, c: "ttpa", r: "TTPA", h: false},
+                {o: 32, c: "tp", r: "TP", h: false},
+                {o: 33, c: "ddim", r: "D-Dím", h: false},
+                {o: 34, c: "pct", r: "PCT", h: false},
+                {o: 35, c: "ferr", r: "Ferr", h: false},
+                {o: 36, c: "amil", r: "Amil", h: false},
+                {o: 37, c: "lip", r: "Lip", h: false},
+                {o: 38, c: "hiv", r: "Anti-HIV", h: false}
+            )
+        },
+        With({
+            // Tabela longa: uma linha por (bloco, exame)
+            L: ForAll(Sequence(CountRows(B) * CountRows(K)), With({
+                    b: Index(B, RoundUp(Value / CountRows(K), 0)),
+                    k: Index(K, Mod(Value - 1, CountRows(K)) + 1)
+                },
+                With({t: b.texto},
+                With({v: Switch(k.c,
+                    "hb",    Match(t, "HEMOGLOBINA\s*:\s*(?<v>[\d,\.]+)\s*g", MatchOptions.IgnoreCase).v,
+                    "ht",    Match(t, "HEMAT[ÓO]CRITO\s*:\s*(?<v>[\d,\.]+)\s*%", MatchOptions.IgnoreCase).v,
+                    "leuco", Match(t, "LEUC[ÓO]CITOS\s+TOTAIS\s*:\s*(?<v>[\d\.]+)", MatchOptions.IgnoreCase).v,
+                    "neut",  Match(t, "SEGMENTADOS\s*:\s*(?<v>[\d,\.]+)\s*%", MatchOptions.IgnoreCase).v,
+                    "linf",  Match(t, "LINF[ÓO]CITOS\s*:\s*(?<v>[\d,\.]+)\s*%", MatchOptions.IgnoreCase).v,
+                    "bast",  Match(t, "BAST[ÕO]ES\s*:\s*(?<v>[\d,\.]+)\s*%", MatchOptions.IgnoreCase).v,
+                    "plaq",  Match(t, "PLAQUETAS[^:]*:\s*\n?\s*(?<v>[\d\.]+)", MatchOptions.IgnoreCase).v,
+                    "blast", Match(t, "BLASTOS?\s*:\s*(?<v>[\d,\.]+)\s*%", MatchOptions.IgnoreCase).v,
+                    "k",     Match(t, "POT[AÁ]SSIO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "na",    Match(t, "S[OÓ]DIO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "cr",    Match(t, "CREATININA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ur",    Match(t, "UREIA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "pcr",   Coalesce(
+                                 Match(t, "PROTE[IÍ]NA C[\- ]?REATIVA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bPCR\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 // formato "PROTEÍNA C REATIVA ... RESULTADO (mg/dL): 4,73"
+                                 If(IsMatch(t, "PROTE[IÍ]NA C[\- ]?REATIVA", MatchOptions.Contains & MatchOptions.IgnoreCase),
+                                    Match(t, "RESULTADO[^:\n]*\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v)),
+                    "tgo",   Coalesce(
+                                 Match(t, "AST/TGO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bTGO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bAST\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    "tgp",   Coalesce(
+                                 Match(t, "ALT/TGP\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bTGP\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bALT\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    "glic",  Match(t, "GLICOSE\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ca",    Match(t, "C[AÁ]LCIO[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "mg",    Match(t, "MAGN[EÉ]SIO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "p",     Match(t, "F[OÓ]SFORO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "bil",   Match(t, "BILIRRUBINA TOTAL\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ggt",   Coalesce(
+                                 Match(t, "GAMA.?GT\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bGGT\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    "fal",   Match(t, "FOSFATASE ALCALINA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "alb",   Match(t, "ALBUMINA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "dhl",   Coalesce(
+                                 Match(t, "\bDHL\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "\bLDH\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    "acur",  Match(t, "[AÁ]CIDO [UÚ]RICO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ferr",  Match(t, "FERRITINA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "hba1c", Coalesce(
+                                 Match(t, "HEMOGLOBINA GLICADA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                                 Match(t, "HBA1C\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    "tgl",   Match(t, "TRIGLICER[IÍ]DEOS\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ct",    Match(t, "COLESTEROL TOTAL\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "hdl",   Match(t, "\bHDL[^:\d]{0,20}:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ldl",   Match(t, "\bLDL[^:\d]{0,20}:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "tsh",   Match(t, "\bTSH\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "t4l",   Match(t, "T4 LIVRE\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "vitd",  Match(t, "VITAMINA D[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "inr",   Match(t, "\bINR\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ttpa",  Match(t, "\bTTPA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "tp",    Match(t, "TEMPO DE PROTROMBINA[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "ddim",  Match(t, "D-?D[IÍ]MERO\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "pct",   Match(t, "PROCALCITONINA\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "amil",  Match(t, "AMILASE\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "lip",   Match(t, "LIPASE\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    "hiv",   If(IsMatch(t, "ANTI.?HIV", MatchOptions.Contains & MatchOptions.IgnoreCase),
+                                Match(t, "RESULTADO\s*:\s*(?<v>N[ÃA]O REAGENTE|REAGENTE)", MatchOptions.IgnoreCase).v)
+                )},
+                {
+                    bi: b.bi, data: b.data, hora: b.hora,
+                    o: k.o, c: k.c, r: k.r, v: v,
+                    // Hemograma: campos existem (mesmo vazios) se o bloco é HEMOGRAMA, demais: só se encontrados
+                    p: If(k.h, IsMatch(t, "HEMOGRAMA", MatchOptions.Contains & MatchOptions.IgnoreCase), !IsBlank(v))
+                })))),
+            // Gasometria por bloco
+            G: Filter(ForAll(B, With({t: texto},
+                {
+                    bi: bi, data: data, hora: hora,
+                    eh: IsMatch(t, "GASOMETRIA", MatchOptions.Contains & MatchOptions.IgnoreCase),
+                    ph: Match(t, "\bpH[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    pco2: Coalesce(
+                        Match(t, "PCO2[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "PRESS[ÃA]O.*?CO2[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    po2: Coalesce(
+                        Match(t, "PO2[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "PRESS[ÃA]O.*?O2[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    hco3: Coalesce(
+                        Match(t, "HCO3[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "HCO-?3[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "BICARBONATO[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    be: Coalesce(
+                        Match(t, "\bBE[:\s]+(?<v>-?[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "\bEB[:\s]+(?<v>-?[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "EXCESSO[^:]*BASE[^:]*:\s*(?<v>-?[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "BASE[^:]*EXCESSO[^:]*:\s*(?<v>-?[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    so2: Coalesce(
+                        Match(t, "\bSO2[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "SatO2[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "SpO2[:\s]+(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "SAT\.?\s*O2[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v),
+                    lact: Coalesce(
+                        Match(t, "LACTATO[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                        Match(t, "[AÁ]CIDO\s+L[AÁ][CT]ICO[^:]*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v)
+                })), eh),
+            // Sumário de urina por bloco
+            U: Filter(ForAll(B, With({t: texto},
+                {
+                    bi: bi, data: data, hora: hora,
+                    eh: IsMatch(t, "SUM[AÁ]RIO DE URINA", MatchOptions.Contains & MatchOptions.IgnoreCase),
+                    // Coluna esquerda: valor vai até o rótulo da coluna direita ("LIGEIRAMENTE TURVO Hemacias:")
+                    asp: Match(t, "ASPECTO\s*:\s*(?<v>[^\s:][^\n:]*?)(?=[ \t]+(?:HEM[AÁ]CIAS|PI[OÓ]CITOS)\s*:|[ \t]*(?:\n|$))", MatchOptions.IgnoreCase).v,
+                    ph: Match(t, "P\.?H\.?\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    dens: Match(t, "DENSIDADE\s*:\s*(?<v>[\d,\.]+)", MatchOptions.IgnoreCase).v,
+                    leuco: Match(t, "LEUCOCITOS\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    // Coluna direita da sedimentoscopia: valor vai até o fim da linha ("5 p/c")
+                    hem: Match(t, "HEM[AÁ]CIAS\s*:\s*(?<v>[^\s:][^\n:]*?)[ \t]*(?=\n|$)", MatchOptions.IgnoreCase).v,
+                    nit: Match(t, "NITRITO\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    prot: Match(t, "PROTEINAS\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    glic: Match(t, "GLICOSE\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    hb: Match(t, "HEMOGLOBINA\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    bil: Match(t, "BILIRRUBINA\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    urob: Match(t, "UROBILINOGENIO\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    cet: Match(t, "CORPOSCETONICO\s*:\s*(?<v>[^\s\n]+)", MatchOptions.IgnoreCase).v,
+                    pio: Match(t, "PI[OÓ]CITOS\s*:\s*(?<v>[^\s:][^\n:]*?)[ \t]*(?=\n|$)", MatchOptions.IgnoreCase).v
+                })), eh)
+        },
+        With({
+            Lp: Filter(L, p),
+            // Datas em ordem cronológica (DD/MM/AA)
+            Datas: Sort(Distinct(B, data), Value(Right(Value, 2)) * 10000 + Value(Mid(Value, 4, 2)) * 100 + Value(Left(Value, 2))),
+            // Gaso/urina: último bloco de cada (data, hora)
+            Gm: Filter(G As x, x.bi = Max(Filter(G As y, y.data = x.data && y.hora = x.hora), bi)),
+            Um: Filter(U As x, x.bi = Max(Filter(U As y, y.data = x.data && y.hora = x.hora), bi)),
+            temBlasto: !IsEmpty(Filter(L, c = "blast" && p && Value(Substitute(v, ",", "."), "en-US") > 0))
+        },
+        With({
+            // Exames mesclados por (data, hora, exame): vale o último bloco (Object.assign)
+            M: Filter(Lp As x, x.bi = Max(Filter(Lp As y, y.data = x.data && y.hora = x.hora && y.c = x.c), bi))
+        },
+        With({
+            // slot = "" se o exame aparece em um único horário no dia, senão, a hora
+            Ms: AddColumns(M As x, slot, If(CountRows(Filter(M As y, y.data = x.data && y.c = x.c)) = 1, "", x.hora))
+        },
+        With({
+            Saida: Concat(Datas As d,
+                With({
+                    slots: Table({s: ""}, ForAll(Sort(Distinct(Filter(B, data = d.Value), hora), Value), {s: Value})),
+                    gd: Sort(Filter(Gm, data = d.Value), hora),
+                    ud: Sort(Filter(Um, data = d.Value), hora)
+                },
+                // Data como tópico, exames do dia abaixo dela, linha em branco entre datas
+                With({corpo:
+                // Linhas de exames (sem hora primeiro, depois uma por horário)
+                Concat(slots As sl,
+                    With({S: Filter(Ms, data = d.Value && slot = sl.s)},
+                    With({partes: Filter(Sort(S, o), !IsBlank(v) && o < 90)},
+                    If(IsEmpty(partes), "",
+                        If(sl.s <> "", sl.s & ": ") &
+                        Concat(partes,
+                            Switch(c,
+                                "leuco", "Leuco: " & v & With({
+                                        ne: LookUp(S, c = "neut").v,
+                                        li: LookUp(S, c = "linf").v,
+                                        ba: LookUp(S, c = "bast").v
+                                    },
+                                    With({dif: Concat(Filter(Table(
+                                            {x: If(!IsBlank(ne), "Neut " & ne & "%")},
+                                            {x: If(!IsBlank(li), "Linf " & li & "%")},
+                                            {x: If(!IsBlank(ba) && Value(Substitute(ba, ",", "."), "en-US") > 0, "Bast " & ba & "%")}
+                                        ), !IsBlank(x)), x, " ")},
+                                    If(dif <> "", " (" & dif & ")"))),
+                                "hiv", "Anti-HIV: " & If(IsMatch(v, "N[ÃA]O", MatchOptions.Contains & MatchOptions.IgnoreCase), "Não reagente", "REAGENTE ⚠️"),
+                                r & ": " & v
+                            ), " | ") & Char(10)))))
+                &
+                // Gasometria
+                Concat(gd,
+                    With({gp: Concat(Filter(Table(
+                            {x: If(!IsBlank(ph), "pH " & ph)},
+                            {x: If(!IsBlank(pco2), "pCO2 " & pco2)},
+                            {x: If(!IsBlank(po2), "pO2 " & po2)},
+                            {x: If(!IsBlank(hco3), "HCO3 " & hco3)},
+                            {x: If(!IsBlank(be), "BE " & be)},
+                            {x: If(!IsBlank(so2), "Sat " & so2 & "%")},
+                            {x: If(!IsBlank(lact), "Lact " & lact)}
+                        ), !IsBlank(x)), x, " | ")},
+                    If(gp = "", "", "Gaso" & If(CountRows(gd) > 1, " " & hora) & ": " & gp & Char(10))))
+                &
+                // Urina — sempre linha própria
+                Concat(ud,
+                    With({up: Concat(Filter(Table(
+                            {x: If(!IsBlank(asp) && !IsMatch(asp, "L[IÍ]MPIDO|AMARELO CLARO", MatchOptions.Contains & MatchOptions.IgnoreCase), "Asp " & asp)},
+                            {x: If(!IsBlank(ph), "pH " & ph)},
+                            {x: If(!IsBlank(dens), "D " & dens)},
+                            {x: If(!IsBlank(leuco), "Leuco " & leuco)},
+                            {x: If(!IsBlank(hem), "Hem " & hem)},
+                            {x: If(!IsBlank(nit), "Nit " & If(IsMatch(nit, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Aus", nit))},
+                            {x: If(!IsBlank(prot) && !IsMatch(prot, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Prot " & prot)},
+                            {x: If(!IsBlank(glic) && !IsMatch(glic, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Glic " & glic)},
+                            {x: If(!IsBlank(hb) && !IsMatch(hb, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Hb " & hb)},
+                            {x: If(!IsBlank(bil) && !IsMatch(bil, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Bil " & bil)},
+                            {x: If(!IsBlank(urob) && !IsMatch(urob, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Urobil " & urob)},
+                            {x: If(!IsBlank(cet) && !IsMatch(cet, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Cetona " & cet)},
+                            {x: If(!IsBlank(pio) && !IsMatch(pio, "^(AUSENTE|AUS|-|NEG|NEGATIV[OA])$", MatchOptions.IgnoreCase), "Piócitos " & pio)}
+                        ), !IsBlank(x)), x, " | ")},
+                    If(up = "", "", "Urina" & If(CountRows(ud) > 1, " " & hora) & ": " & up & Char(10))))
+                },
+                If(corpo = "", "", "• " & d.Value & Char(10) & corpo & Char(10)))
+                ))
+        },
+        // Cada data termina com uma linha em branco, remove a última
+        With({linhas: Left(Saida, Len(Saida) - 2)},
+            If(Saida = "", "Nenhum exame reconhecido.",
+            If(temBlasto,
+                "****ATENÇÃO PARA PRESENÇA DE BLASTOS****" & Char(10) & linhas & Char(10) & "****ATENÇÃO PARA PRESENÇA DE BLASTOS****",
+                linhas))
+        )))))))))))
+      Size: =10
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(208, 208, 208, 1)
+      BorderThickness: =1
+      PaddingLeft: =12
+      PaddingRight: =12
+      PaddingTop: =10
+      PaddingBottom: =10
+      VerticalAlign: =VerticalAlign.Top
+      Overflow: =Overflow.Scroll
+- BtnLimpar:
+    Control: Classic/Button@2.2.0
+    Properties:
+      X: =40
+      Y: =662
+      Width: =120
+      Height: =38
+      Text: ="Limpar"
+      OnSelect: =Reset(TextInput1)
+      Font: =Font.'Segoe UI'
+      Size: =11
+      Fill: =RGBA(255, 255, 255, 1)
+      Color: =RGBA(51, 51, 51, 1)
+      BorderColor: =RGBA(208, 208, 208, 1)
+      BorderThickness: =1
+      HoverFill: =RGBA(240, 240, 240, 1)
+      HoverColor: =RGBA(51, 51, 51, 1)
+      HoverBorderColor: =RGBA(208, 208, 208, 1)
+      PressedFill: =RGBA(208, 208, 208, 1)
+      PressedColor: =RGBA(51, 51, 51, 1)
+      PressedBorderColor: =RGBA(208, 208, 208, 1)
+      RadiusTopLeft: =4
+      RadiusTopRight: =4
+      RadiusBottomLeft: =4
+      RadiusBottomRight: =4
+- BtnCopiar:
+    Control: Classic/Button@2.2.0
+    Properties:
+      X: =700
+      Y: =662
+      Width: =190
+      Height: =38
+      Text: ="Copiar resultado"
+      OnSelect: =Copy(Resultado.Text); Notify("Resultado copiado", NotificationType.Success)
+      Font: =Font.'Segoe UI'
+      Size: =11
+      FontWeight: =FontWeight.Semibold
+      Fill: =RGBA(26, 35, 126, 1)
+      Color: =RGBA(255, 255, 255, 1)
+      BorderThickness: =0
+      HoverFill: =RGBA(40, 53, 147, 1)
+      HoverColor: =RGBA(255, 255, 255, 1)
+      PressedFill: =RGBA(57, 73, 171, 1)
+      PressedColor: =RGBA(255, 255, 255, 1)
+      RadiusTopLeft: =4
+      RadiusTopRight: =4
+      RadiusBottomLeft: =4
+      RadiusBottomRight: =4
+- Privacidade:
+    Control: Label@2.5.1
+    Properties:
+      Font: =Font.'Segoe UI'
+      Color: =RGBA(153, 153, 153, 1)
+      X: =40
+      Y: =716
+      Width: =1286
+      Height: =24
+      Text: ="🔒 Processado dentro do app — nenhum dado do paciente é salvo."
+      Size: =9
