@@ -1,4 +1,4 @@
-// Interno++ — motor de extração de exames (Power Fx, sintaxe pt-BR)
+// Transcritor de Exames — motor de extração de exames (Power Fx, sintaxe pt-BR)
 // Port de parseLaudo do index.html. Mantenha as duas versões em sincronia.
 // Cole na propriedade Text do rótulo de resultado. Entrada: TextInput1.
 //

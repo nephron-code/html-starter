@@ -7,7 +7,7 @@
       Y: =20
       Width: =800
       Height: =44
-      Text: ="Interno++ · Exames"
+      Text: ="Transcritor de Exames"
       Size: =22
       FontWeight: =FontWeight.Semibold
 - Subtitulo:
@@ -106,7 +106,7 @@
       Width: =626
       Height: =490
       Text: |-
-        =// Interno++ — motor de extração de exames (Power Fx, sintaxe pt-BR)
+        =// Transcritor de Exames — motor de extração de exames (Power Fx, sintaxe pt-BR)
         // Port de parseLaudo do index.html. Mantenha as duas versões em sincronia.
         // Cole na propriedade Text do rótulo de resultado. Entrada: TextInput1.
         //

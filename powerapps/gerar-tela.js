@@ -60,7 +60,7 @@ const telas = [
     // Fundo da tela (#f5f5f5) é definido à mão em Screen1.Fill: telas não são coladas via YAML
     rotulo('Titulo', {
         X: 40, Y: 20, Width: 800, Height: 44,
-        Text: texto('Interno++ · Exames'), Size: 22, FontWeight: 'FontWeight.Semibold', Color: C.azul,
+        Text: texto('Transcritor de Exames'), Size: 22, FontWeight: 'FontWeight.Semibold', Color: C.azul,
     }),
     rotulo('Subtitulo', {
         X: 40, Y: 62, Width: 1000, Height: 24,
