@@ -161,6 +161,7 @@
 <div class="section">
     <h3>Exames Laboratoriais</h3>
     <p class="hint">No AGHU, abra o Laudo Individual → Ctrl+A → Ctrl+C → clique na caixa abaixo → Ctrl+V → Extrair. Repita para cada data antes de extrair.</p>
+    <p class="hint">⚠️ Culturas e anticorpos de doenças reumatológicas (ex.: FAN, fator reumatoide) não são importados — transcreva manualmente.</p>
     <p class="privacy-note">🔒 Processamento local — nenhum dado é enviado a servidores externos.</p>
     <textarea id="textoLab" placeholder="Cole o laudo aqui..."></textarea>
     <div class="actions">
@@ -1024,7 +1025,7 @@ function buildMainLine(date, time, e) {
     if (e.hiv) parts.push('Anti-HIV: ' + (/N[ÃA]O/i.test(e.hiv) ? 'Não reagente' : 'REAGENTE ⚠️'));
     if (!parts.length) return null;
     const prefix = time ? date + ' ' + time : date;
-    return prefix + ' → ' + parts.join(' | ');
+    return prefix + ': ' + parts.join(' | ');
 }
 
 function buildGasoLine(date, time, v) {
