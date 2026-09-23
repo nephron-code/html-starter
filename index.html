@@ -765,11 +765,13 @@ function extrairLab() {
 
 function findBlocks(text) {
     const blocks = [];
-    const pat = /Recebimento material:\s*(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2})/gi;
+    // Aceita ano com 2 ou 4 dígitos (AGHU passou a usar DD/MM/YYYY); normaliza para DD/MM/YY
+    const pat = /Recebimento material:\s*(\d{2}\/\d{2}\/(?:\d{4}|\d{2}))\s+(\d{2}:\d{2})/gi;
     const pos = [];
     let m;
     while ((m = pat.exec(text)) !== null) {
-        pos.push({ idx: m.index, end: m.index + m[0].length, date: m[1], time: m[2] });
+        const date = m[1].length === 10 ? m[1].slice(0, 6) + m[1].slice(8) : m[1];
+        pos.push({ idx: m.index, end: m.index + m[0].length, date, time: m[2] });
     }
     // No AGHU, "Recebimento material:" fica no FINAL de cada exame.
     // O bloco de cada exame é o texto ANTES do seu marcador.
@@ -859,6 +861,11 @@ function parseOtherExams(t) {
     for (const [key, ...pats] of map) {
         const v = getRaw(t, ...pats);
         if (v !== null) res[key] = v;
+    }
+    // PCR no formato "PROTEÍNA C REATIVA ... RESULTADO (mg/dL): 4,73"
+    if (!res.pcr && /PROTE[IÍ]NA C[- ]?REATIVA/i.test(t)) {
+        const v = getRaw(t, /RESULTADO[^:\n]*:\s*([\d,\.]+)/i);
+        if (v !== null) res.pcr = v;
     }
     // Anti-HIV
     if (/ANTI.?HIV/i.test(t)) {
